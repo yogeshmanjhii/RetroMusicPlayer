@@ -114,8 +114,8 @@ public class MusicUtil {
     @NonNull
     public static String getArtistInfoString(@NonNull final Context context,
                                              @NonNull final Artist artist) {
-        int albumCount = artist.getAlbumCount();
-        int songCount = artist.getSongCount();
+        long albumCount = artist.getAlbumCount();
+        long songCount = artist.getSongCount();
         String albumString = albumCount == 1 ? context.getResources().getString(R.string.album)
                 : context.getResources().getString(R.string.albums);
         String songString = songCount == 1 ? context.getResources().getString(R.string.song)
@@ -126,7 +126,7 @@ public class MusicUtil {
     @NonNull
     public static String getArtistInfoStringSmall(@NonNull final Context context,
                                                   @NonNull final Artist artist) {
-        int songCount = artist.getSongCount();
+        long songCount = artist.getSongCount();
         String songString = songCount == 1 ? context.getResources().getString(R.string.song)
                 : context.getResources().getString(R.string.songs);
         return songCount + " " + songString;
@@ -435,9 +435,9 @@ public class MusicUtil {
         if (TextUtils.isEmpty(artistName)) {
             return false;
         }
-        if (artistName.equals(Artist.UNKNOWN_ARTIST_DISPLAY_NAME)) {
+       /* if (artistName.equals(Artist.UNKNOWN_ARTIST_DISPLAY_NAME)) {
             return true;
-        }
+        }*/
         artistName = artistName.trim().toLowerCase();
         return artistName.equals("unknown") || artistName.equals("<unknown>");
     }

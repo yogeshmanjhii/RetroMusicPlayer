@@ -14,15 +14,20 @@
 
 package code.name.monkey.retromusic.mvp.presenter
 
+import code.name.monkey.retromusic.Result
+import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.BaseView
 import code.name.monkey.retromusic.mvp.Presenter
 import code.name.monkey.retromusic.mvp.PresenterImpl
 import code.name.monkey.retromusic.providers.interfaces.Repository
 import code.name.monkey.retromusic.rest.model.LastFmArtist
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -30,13 +35,23 @@ import javax.inject.Inject
  */
 interface ArtistDetailsView : BaseView {
     fun artist(artist: Artist)
+
+    fun artistSong(songs: ArrayList<Song>)
+
+    fun artistAlbums(albums: ArrayList<Album>)
+
     fun artistInfo(lastFmArtist: LastFmArtist?)
+
     fun complete()
 }
 
 interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
 
-    fun loadArtist(artistId: Int)
+    fun loadArtist(artistId: Long)
+
+    fun loadArtistSongs(artistId: Long)
+
+    fun loadArtistAlbums(artistId: Long)
 
     fun loadBiography(name: String,
                       lang: String? = Locale.getDefault().language,
@@ -44,7 +59,38 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
 
     class ArtistDetailsPresenterImpl @Inject constructor(
             private val repository: Repository
-    ) : PresenterImpl<ArtistDetailsView>(), ArtistDetailsPresenter {
+    ) : PresenterImpl<ArtistDetailsView>(), ArtistDetailsPresenter, CoroutineScope {
+
+        override fun loadArtistAlbums(artistId: Long) {
+            launch {
+                when (val result = repository.getArtistAlbums(artistId)) {
+                    is Result.Success -> withContext(Dispatchers.Main) {
+                        view?.artistAlbums(result.data)
+                    }
+                    is Result.Error -> withContext(Dispatchers.Main) {
+                        view?.showEmptyView()
+                    }
+                }
+            }
+        }
+
+        override fun loadArtistSongs(artistId: Long) {
+            launch {
+                when (val result = repository.getArtistSongs(artistId)) {
+                    is Result.Success -> withContext(Dispatchers.Main) {
+                        view?.artistSong(result.data)
+                    }
+                    is Result.Error -> withContext(Dispatchers.Main) {
+                        view?.showEmptyView()
+                    }
+                }
+            }
+        }
+
+        override val coroutineContext: CoroutineContext
+            get() = Dispatchers.IO + job
+
+        private val job = Job()
 
         override fun loadBiography(name: String,
                                    lang: String?,
@@ -57,18 +103,23 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
 
         private var disposable = CompositeDisposable()
 
-        override fun loadArtist(artistId: Int) {
-            disposable += repository.getArtistByIdFlowable(artistId)
-                    .doOnComplete {
+        override fun loadArtist(artistId: Long) {
+            launch {
+                when (val result = repository.getArtistById(artistId)) {
+                    is Result.Success -> withContext(Dispatchers.Main) {
+                        view?.artist(result.data)
                         view?.complete()
                     }
-                    .subscribe({
-                        view?.artist(it)
-                    }, { t -> println(t) })
+                    is Result.Error -> withContext(Dispatchers.Main) {
+                        view?.showEmptyView()
+                    }
+                }
+            }
         }
 
         override fun detachView() {
             super.detachView()
+            job.cancel()
             disposable.dispose()
         }
     }

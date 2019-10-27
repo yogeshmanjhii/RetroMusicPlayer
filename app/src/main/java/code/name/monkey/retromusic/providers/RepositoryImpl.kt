@@ -33,7 +33,7 @@ class RepositoryImpl(private val context: Context) : Repository {
 
     override suspend fun allAlbums(): Result<ArrayList<Album>> {
         return try {
-            val albums = AlbumLoader.getAllAlbums(context)
+            val albums = AlbumLoader.allAlbums(context)
             if (albums.isNotEmpty()) {
                 Success(albums)
             } else {
@@ -230,6 +230,42 @@ class RepositoryImpl(private val context: Context) : Repository {
         }
     }
 
+    override suspend fun getArtistById(artistId: Long): Result<Artist> {
+        return try {
+            val artist = ArtistLoader.getArtist(context, artistId)
+            Success(artist)
+        } catch (er: Exception) {
+            Error(er)
+        }
+    }
+
+    override suspend fun getArtistSongs(artistId: Long): Result<ArrayList<Song>> {
+        return try {
+            val songs = ArtistLoader.artistSongs(context, artistId)
+            Success(songs)
+        } catch (er: Exception) {
+            Error(er)
+        }
+    }
+
+    override suspend fun getArtistAlbums(artistId: Long): Result<ArrayList<Album>> {
+        return try {
+            val albums = ArtistLoader.artistAlbums(context, artistId)
+            Success(albums)
+        } catch (er: Exception) {
+            Error(er)
+        }
+    }
+
+    override suspend fun getAlbum(albumId: Long): Result<Album> {
+        return try {
+            val album = AlbumLoader.getAlbum(context, albumId)
+            Success(album)
+        } catch (er: Exception) {
+            Error(er)
+        }
+    }
+
     override fun artistInfoFloable(
             name: String,
             lang: String?,
@@ -247,17 +283,11 @@ class RepositoryImpl(private val context: Context) : Repository {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun getAlbumFlowable(albumId: Int): Observable<Album> {
+   /* override fun getAlbumFlowable(albumId: Int): Observable<Album> {
         return AlbumLoader.getAlbumFlowable(context, albumId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    override fun getArtistByIdFlowable(artistId: Int): Observable<Artist> {
-        return ArtistLoader.getArtistFlowable(context, artistId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
+    }*/
 
     override fun getPlaylistSongsFlowable(playlist: Playlist): Observable<ArrayList<Song>> {
         return PlaylistSongsLoader.getPlaylistSongListFlowable(context, playlist)
@@ -288,15 +318,12 @@ class RepositoryImpl(private val context: Context) : Repository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-    override val allAlbumsFlowable: Observable<ArrayList<Album>>
+    /*override val allAlbumsFlowable: Observable<ArrayList<Album>>
         get() = AlbumLoader.getAllAlbumsFlowable(context)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())*/
 
-    override val recentAlbumsFlowable: Observable<ArrayList<Album>>
-        get() = LastAddedSongsLoader.getLastAddedAlbumsFlowable(context)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+
 
     override val topAlbumsFlowable: Observable<ArrayList<Album>>
         get() = TopAndRecentlyPlayedTracksLoader.getTopAlbumsFlowable(context)
@@ -304,14 +331,8 @@ class RepositoryImpl(private val context: Context) : Repository {
                 .observeOn(AndroidSchedulers.mainThread())
 
     override val allArtistsFlowable: Observable<ArrayList<Artist>>
-        get() = ArtistLoader.getAllArtistsFlowable(context)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        get() = Observable.just(ArrayList())
 
-    override val recentArtistsFlowable: Observable<ArrayList<Artist>>
-        get() = LastAddedSongsLoader.getLastAddedArtistsFlowable(context)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
 
     override val topArtistsFlowable: Observable<ArrayList<Artist>>
         get() = TopAndRecentlyPlayedTracksLoader.getTopArtistsFlowable(context)
@@ -332,14 +353,4 @@ class RepositoryImpl(private val context: Context) : Repository {
     override fun getSong(id: Int): Song {
         return SongLoader.getSong(context, id)
     }
-
-    override fun getAlbum(albumId: Int): Album {
-        return AlbumLoader.getAlbum(context, albumId)
-    }
-
-    override fun getArtistById(artistId: Long): Artist {
-        return ArtistLoader.getArtist(context, artistId.toInt())
-    }
-
-
 }

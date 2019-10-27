@@ -14,10 +14,8 @@
 
 package code.name.monkey.retromusic.model
 
-import code.name.monkey.retromusic.util.MusicUtil
-import java.util.*
 
-
+/*
 class Artist {
     val albums: ArrayList<Album>?
 
@@ -69,3 +67,11 @@ class Artist {
         const val UNKNOWN_ARTIST_DISPLAY_NAME = "Unknown Artist"
     }
 }
+*/
+
+
+class Artist(
+        val id: Long = -1,
+        val name: String = "",
+        val albumCount: Long = -1,
+        val songCount: Long = -1)

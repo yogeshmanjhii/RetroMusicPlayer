@@ -15,11 +15,13 @@
 package code.name.monkey.retromusic.loaders
 
 import android.content.Context
-import android.provider.MediaStore.Audio.AudioColumns
+import android.database.Cursor
+import android.provider.MediaStore
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
-import io.reactivex.Observable
 
 
 object ArtistLoader {
@@ -30,30 +32,140 @@ object ArtistLoader {
                 PreferenceUtil.getInstance(context).artistDetailSongSortOrder
     }
 
-    fun getAllArtistsFlowable(
-            context: Context
-    ): Observable<ArrayList<Artist>> {
-        return Observable.create { e ->
-            SongLoader.getSongsFlowable(SongLoader.makeSongCursor(
-                    context, null, null,
-                    getSongLoaderSortOrder(context))
-            ).subscribe { songs ->
-                e.onNext(splitIntoArtists(AlbumLoader.splitIntoAlbums(songs)))
-                e.onComplete()
-            }
-        }
-    }
 
     fun getAllArtists(context: Context): ArrayList<Artist> {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
-                context,
-                null, null,
-                getSongLoaderSortOrder(context))
-        )
-        return splitIntoArtists(AlbumLoader.splitIntoAlbums(songs))
+        return getArtistsForCursor(makeArtistCursor(context, null, null));
     }
 
-    fun getArtistsFlowable(context: Context, query: String): Observable<ArrayList<Artist>> {
+    private fun getArtistsForCursor(cursor: Cursor?): java.util.ArrayList<Artist> {
+        val arrayList = ArrayList<Artist>()
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                arrayList.add(Artist(cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getLong(2),
+                        cursor.getLong(3)))
+            } while (cursor.moveToNext())
+        }
+        cursor?.close()
+        return arrayList
+    }
+
+
+    fun getArtist(cursor: Cursor?): Artist {
+        var artist = Artist()
+        if (cursor != null) {
+            if (cursor.moveToFirst())
+                artist = Artist(cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getLong(2),
+                        cursor.getLong(3))
+        }
+        cursor?.close()
+        return artist
+    }
+
+    fun getArtist(context: Context, id: Long): Artist {
+        return getArtist(makeArtistCursor(context, "_id=?", arrayOf(id.toString())))
+    }
+
+    fun getArtists(context: Context, paramString: String, limit: Int): List<Artist> {
+        val result = getArtistsForCursor(makeArtistCursor(context, "artist LIKE ?", arrayOf("$paramString%")))
+        if (result.size < limit) {
+            result.addAll(getArtistsForCursor(makeArtistCursor(context, "artist LIKE ?", arrayOf("%_$paramString%"))))
+        }
+        return if (result.size < limit) result else result.subList(0, limit)
+    }
+
+
+    fun artistSongs(context: Context, artistId: Long): ArrayList<Song> {
+        val arrayList = arrayListOf<Song>()
+        val cursor = makeArtistSongsCursor(context, artistId)
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                arrayList.add(getSongFromCursorImpl(cursor))
+            } while (cursor.moveToNext())
+        }
+        cursor?.close()
+        return arrayList
+    }
+
+    private fun getSongFromCursorImpl(
+            cursor: Cursor
+    ): Song {
+        val id = cursor.getInt(0)
+        val title = cursor.getString(1)
+        val trackNumber = cursor.getInt(2)
+        val year = cursor.getInt(3)
+        val duration = cursor.getLong(4)
+        val data = cursor.getString(5)
+        val dateModified = cursor.getLong(6)
+        val albumId = cursor.getInt(7)
+        val albumName = cursor.getString(8)
+        val artistId = cursor.getInt(9)
+        val artistName = cursor.getString(10)
+        val composer = cursor.getString(11)
+
+        return Song(id, title, trackNumber, year, duration, data, dateModified, albumId,
+                albumName ?: "", artistId, artistName, composer ?: "")
+    }
+
+    fun artistAlbums(context: Context, artistId: Long): ArrayList<Album> {
+        val arrayList = ArrayList<Album>()
+        val cursor = makeArtistAlbumsCursor(context, artistId)
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                arrayList.add(Album(
+                        cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                         artistId,
+                        cursor.getInt(3),
+                        cursor.getInt(4)))
+            } while (cursor.moveToNext())
+        }
+        cursor?.close()
+        return arrayList
+    }
+
+    private fun makeArtistAlbumsCursor(context: Context, artistId: Long): Cursor? {
+        val sortOrder = PreferenceUtil.getInstance(context).artistAlbumSortOrder
+        return context.contentResolver.query(MediaStore.Audio.Artists.Albums.getContentUri("external", artistId),
+                arrayOf("_id",
+                        MediaStore.Audio.Artists.Albums.ALBUM,
+                        MediaStore.Audio.Artists.Albums.ARTIST,
+                        MediaStore.Audio.Artists.Albums.NUMBER_OF_SONGS,
+                        MediaStore.Audio.Artists.Albums.FIRST_YEAR),
+                null,
+                null,
+                sortOrder)
+
+    }
+
+    private fun makeArtistSongsCursor(context: Context, artistId: Long): Cursor? {
+        val sortOrder = PreferenceUtil.getInstance(context).artistSongSortOrder
+        val selection = "is_music=1 AND title != '' AND artist_id=$artistId"
+        return context.contentResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                Constants.baseProjection,
+                selection,
+                null,
+                sortOrder)
+    }
+
+    private fun makeArtistCursor(context: Context,
+                                 selection: String?,
+                                 selectionValues: Array<String>?
+    ): Cursor? {
+        val sortOrder = PreferenceUtil.getInstance(context).artistSortOrder
+        return context.contentResolver.query(
+                MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+                arrayOf("_id", "artist", "number_of_albums", "number_of_tracks"),
+                selection,
+                selectionValues,
+                sortOrder
+        )
+    }
+    /*fun getArtistsFlowable(context: Context, query: String): Observable<ArrayList<Artist>> {
         return Observable.create { e ->
             SongLoader.getSongsFlowable(SongLoader.makeSongCursor(
                     context,
@@ -134,5 +246,19 @@ object ArtistLoader {
                 getSongLoaderSortOrder(context))
         )
         return Artist(AlbumLoader.splitIntoAlbums(songs))
-    }
+    }*/
+    /*fun getAllArtistsFlowable(
+           context: Context
+   ): Observable<ArrayList<Artist>> {
+       return Observable.create { e ->
+           SongLoader.getSongsFlowable(SongLoader.makeSongCursor(
+                   context, null, null,
+                   getSongLoaderSortOrder(context))
+           ).subscribe { songs ->
+               e.onNext(splitIntoArtists(AlbumLoader.splitIntoAlbums(songs)))
+               e.onComplete()
+           }
+       }
+   }*/
+
 }

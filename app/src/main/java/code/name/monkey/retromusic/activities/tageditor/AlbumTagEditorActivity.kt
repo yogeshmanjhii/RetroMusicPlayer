@@ -20,7 +20,7 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteTranscoder
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteWrapper
-import code.name.monkey.retromusic.loaders.AlbumLoader
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.rest.LastFMRestClient
 import code.name.monkey.retromusic.rest.model.LastFmAlbum
 import code.name.monkey.retromusic.util.ImageUtil
@@ -38,6 +38,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_album_tag_editor.*
 import org.jaudiotagger.tag.FieldKey
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
@@ -228,7 +229,7 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
     }
 
     override fun getSongPaths(): List<String> {
-        val songs = AlbumLoader.getAlbum(this, id).songs
+        val songs = ArrayList<Song>()//AlbumLoader.getAlbum(this, id).songs
         val paths = ArrayList<String>(songs!!.size)
         for (song in songs) {
             paths.add(song.data)

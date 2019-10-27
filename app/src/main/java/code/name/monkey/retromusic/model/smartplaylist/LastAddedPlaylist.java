@@ -49,11 +49,6 @@ public class LastAddedPlaylist extends AbsSmartPlaylist {
         super(in);
     }
 
-    @NonNull
-    @Override
-    public Observable<ArrayList<Song>> getSongsFlowable(@NotNull @NonNull Context context) {
-        return LastAddedSongsLoader.INSTANCE.getLastAddedSongsFlowable(context);
-    }
 
     @NonNull
     @Override

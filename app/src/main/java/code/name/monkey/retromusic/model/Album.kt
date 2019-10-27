@@ -14,10 +14,8 @@
 
 package code.name.monkey.retromusic.model
 
-import java.util.*
 
-
-class Album {
+/*class Album {
     val songs: ArrayList<Song>?
 
     val id: Int
@@ -52,4 +50,12 @@ class Album {
     fun safeGetFirstSong(): Song {
         return if (songs!!.isEmpty()) Song.emptySong else songs[0]
     }
-}
+}*/
+
+class Album(
+        val id: Long = -1,
+        val title: String = "",
+        val artistName: String = "",
+        val artistId: Long = -1,
+        val songCount: Int = -1,
+        val year: Int = -1)

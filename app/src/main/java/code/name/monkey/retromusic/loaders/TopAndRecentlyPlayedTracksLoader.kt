@@ -24,7 +24,6 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.HistoryStore
 import code.name.monkey.retromusic.providers.SongPlayCountStore
 import io.reactivex.Observable
-import java.util.*
 
 /**
  * Created by hemanths on 16/08/17.
@@ -144,7 +143,7 @@ object TopAndRecentlyPlayedTracksLoader {
         return Observable.create { e ->
             getTopTracksFlowable(context).subscribe { songs ->
                 if (songs.size > 0) {
-                    e.onNext(AlbumLoader.splitIntoAlbums(songs))
+                    e.onNext( arrayListOf<Album>())
                 }
                 e.onComplete()
             }
@@ -154,15 +153,15 @@ object TopAndRecentlyPlayedTracksLoader {
     fun getTopAlbums(
             context: Context
     ): ArrayList<Album> {
-        arrayListOf<Album>()
-        return AlbumLoader.splitIntoAlbums(getTopTracks(context))
+
+        return  arrayListOf<Album>()
     }
 
     fun getTopArtistsFlowable(context: Context): Observable<ArrayList<Artist>> {
         return Observable.create { e ->
             getTopAlbumsFlowable(context).subscribe { albums ->
                 if (albums.size > 0) {
-                    e.onNext(ArtistLoader.splitIntoArtists(albums))
+                    e.onNext(ArrayList())
                 }
                 e.onComplete()
             }
@@ -170,6 +169,6 @@ object TopAndRecentlyPlayedTracksLoader {
     }
 
     fun getTopArtists(context: Context): ArrayList<Artist> {
-        return ArtistLoader.splitIntoArtists(getTopAlbums(context))
+        return ArrayList()
     }
 }

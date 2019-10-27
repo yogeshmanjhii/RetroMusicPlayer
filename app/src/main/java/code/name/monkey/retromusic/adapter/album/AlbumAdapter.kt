@@ -2,7 +2,6 @@ package code.name.monkey.retromusic.adapter.album
 
 import android.app.ActivityOptions
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -14,18 +13,13 @@ import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.AbsMultiSelectAdapter
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
-import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.helper.menu.SongsMenuHelper
 import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.MusicUtil
-import code.name.monkey.retromusic.util.NavigationUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
-import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
 
@@ -91,7 +85,7 @@ open class AlbumAdapter(protected val activity: AppCompatActivity,
             holder.text!!.text = getAlbumText(album)
         }
         if (holder.playSongs != null) {
-            holder.playSongs!!.setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
+            //holder.playSongs!!.setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
         }
         loadAlbumCover(album, holder)
     }
@@ -112,7 +106,7 @@ open class AlbumAdapter(protected val activity: AppCompatActivity,
             return
         }
 
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+        /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(object : RetroMusicColoredTarget(holder.image!!) {
@@ -124,7 +118,7 @@ open class AlbumAdapter(protected val activity: AppCompatActivity,
                     override fun onColorReady(color: Int) {
                         setColors(color, holder)
                     }
-                })
+                })*/
     }
 
     override fun getItemCount(): Int {
@@ -151,7 +145,7 @@ open class AlbumAdapter(protected val activity: AppCompatActivity,
     private fun getSongList(albums: List<Album>): ArrayList<Song> {
         val songs = ArrayList<Song>()
         for (album in albums) {
-            songs.addAll(album.songs!!)
+            //songs.addAll(album.songs!!)
         }
         return songs
     }
@@ -182,7 +176,7 @@ open class AlbumAdapter(protected val activity: AppCompatActivity,
                 toggleChecked(adapterPosition)
             } else {
                 val activityOptions = ActivityOptions.makeSceneTransitionAnimation(activity, image, activity.getString(R.string.transition_album_art))
-                NavigationUtil.goToAlbumOptions(activity, dataSet[adapterPosition].id, activityOptions)
+                //NavigationUtil.goToAlbumOptions(activity, dataSet[adapterPosition].id, activityOptions)
             }
         }
 

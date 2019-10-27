@@ -113,7 +113,7 @@ class ArtistAdapter(val activity: AppCompatActivity,
     private fun getSongList(artists: List<Artist>): ArrayList<Song> {
         val songs = ArrayList<Song>()
         for (artist in artists) {
-            songs.addAll(artist.songs) // maybe async in future?
+            //songs.addAll(artist.songs) // maybe async in future?
         }
         return songs
     }

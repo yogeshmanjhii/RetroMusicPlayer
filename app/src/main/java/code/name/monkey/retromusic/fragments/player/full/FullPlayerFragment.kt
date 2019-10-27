@@ -14,19 +14,13 @@ import code.name.monkey.retromusic.extensions.hide
 import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.fragments.base.AbsPlayerFragment
 import code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment
-import code.name.monkey.retromusic.glide.ArtistGlideRequest
-import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
-import code.name.monkey.retromusic.loaders.ArtistLoader
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.model.lyrics.AbsSynchronizedLyrics
 import code.name.monkey.retromusic.model.lyrics.Lyrics
 import code.name.monkey.retromusic.util.NavigationUtil
-import com.bumptech.glide.Glide
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_full.*
 
 class FullPlayerFragment : AbsPlayerFragment(), MusicProgressViewUpdateHelper.Callback {
@@ -213,7 +207,7 @@ class FullPlayerFragment : AbsPlayerFragment(), MusicProgressViewUpdateHelper.Ca
     private val compositeDisposable = CompositeDisposable()
 
     private fun updateArtistImage() {
-        compositeDisposable.addAll(ArtistLoader.getArtistFlowable(context!!, MusicPlayerRemote.currentSong.artistId)
+        /*compositeDisposable.addAll(ArtistLoader.getArtistFlowable(context!!, MusicPlayerRemote.currentSong.artistId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -224,7 +218,7 @@ class FullPlayerFragment : AbsPlayerFragment(), MusicProgressViewUpdateHelper.Ca
 
                                 }
                             })
-                })
+                })*/
     }
 
     override fun onQueueChanged() {

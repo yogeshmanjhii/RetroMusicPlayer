@@ -10,14 +10,12 @@ import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.menu.SongMenuHelper
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.MusicUtil
-import code.name.monkey.retromusic.util.NavigationUtil
 import com.bumptech.glide.Glide
 import android.util.Pair as UtilPair
 
@@ -47,9 +45,9 @@ class SearchAdapter(
                 val album = dataSet?.get(position) as Album
                 holder.title?.text = album.title
                 holder.text?.text = album.artistName
-                SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+                /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
                         .checkIgnoreMediaStore(activity).build()
-                        .into(holder.image)
+                        .into(holder.image)*/
             }
             ARTIST -> {
                 val artist = dataSet?.get(position) as Artist
@@ -106,12 +104,12 @@ class SearchAdapter(
                 ALBUM -> {
                     val options = ActivityOptions.makeSceneTransitionAnimation(activity,
                             UtilPair.create(image, activity.getString(R.string.transition_album_art)))
-                    NavigationUtil.goToAlbumOptions(activity, (item as Album).id, options)
+                    //NavigationUtil.goToAlbumOptions(activity, (item as Album).id, options)
                 }
                 ARTIST -> {
                     val options = ActivityOptions.makeSceneTransitionAnimation(activity,
                             UtilPair.create(image, activity.getString(R.string.transition_artist_image)))
-                    NavigationUtil.goToArtistOptions(activity, (item as Artist).id, options)
+                    //NavigationUtil.goToArtistOptions(activity, (item as Artist).id, options)
                 }
                 SONG -> {
                     val playList = ArrayList<Song>()

@@ -32,7 +32,9 @@ import code.name.monkey.retromusic.glide.ArtistGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.misc.AppBarStateChangeListener
+import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.presenter.ArtistDetailsPresenter
 import code.name.monkey.retromusic.mvp.presenter.ArtistDetailsView
 import code.name.monkey.retromusic.rest.LastFMRestClient
@@ -47,6 +49,7 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
+
 
     private var biography: Spanned? = null
     private lateinit var artist: Artist
@@ -84,10 +87,10 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
         setUpViews()
 
         playAction.apply {
-            setOnClickListener { MusicPlayerRemote.openQueue(artist.songs, 0, true) }
+            //setOnClickListener { MusicPlayerRemote.openQueue(artist.songs, 0, true) }
         }
         shuffleAction.apply {
-            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(artist.songs, true) }
+            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(artist.songs, true) }
         }
 
         biographyText.setOnClickListener {
@@ -102,7 +105,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
         artistDetailsPresenter.attachView(this)
 
         if (intent.extras!!.containsKey(EXTRA_ARTIST_ID)) {
-            intent.extras?.getInt(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
+            intent.extras?.getLong(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
         } else {
             finish()
         }
@@ -211,11 +214,19 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
             loadBiography(artist.name)
         }
         artistTitle.text = artist.name
-        text.text = String.format("%s • %s", MusicUtil.getArtistInfoString(this, artist), MusicUtil
-                .getReadableDurationString(MusicUtil.getTotalDuration(this, artist.songs)))
+        text.text = String.format("%s", MusicUtil.getArtistInfoString(this, artist))
 
-        songAdapter.swapDataSet(artist.songs)
-        albumAdapter.swapDataSet(artist.albums!!)
+        artistDetailsPresenter.loadArtistSongs(artist.id)
+        artistDetailsPresenter.loadArtistAlbums(artist.id)
+
+    }
+
+    override fun artistSong(songs: ArrayList<Song>) {
+        songAdapter.swapDataSet(songs)
+    }
+
+    override fun artistAlbums(albums: ArrayList<Album>) {
+        albumAdapter.swapDataSet(albums)
     }
 
     private fun loadBiography(name: String,
@@ -280,7 +291,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
     }
 
     private fun handleSortOrderMenuItem(item: MenuItem): Boolean {
-        val songs = artist.songs
+        val songs = ArrayList<Song>()
         when (item.itemId) {
             android.R.id.home -> {
                 super.onBackPressed()
@@ -327,7 +338,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView {
 
     private fun reload() {
         if (intent.extras!!.containsKey(EXTRA_ARTIST_ID)) {
-            intent.extras?.getInt(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
+            intent.extras?.getLong(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
         } else {
             finish()
         }

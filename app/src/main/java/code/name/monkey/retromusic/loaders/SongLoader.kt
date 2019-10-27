@@ -113,11 +113,10 @@ object SongLoader {
     fun getSong(
             cursor: Cursor?
     ): Song {
-        val song: Song
-        if (cursor != null && cursor.moveToFirst()) {
-            song = getSongFromCursorImpl(cursor)
+        val song: Song = if (cursor != null && cursor.moveToFirst()) {
+            getSongFromCursorImpl(cursor)
         } else {
-            song = Song.emptySong
+            Song.emptySong
         }
         cursor?.close()
         return song
@@ -140,7 +139,7 @@ object SongLoader {
     fun suggestSongs(
             context: Context
     ): Observable<ArrayList<Song>> {
-        return SongLoader.getAllSongsFlowable(context)
+        return getAllSongsFlowable(context)
                 .flatMap {
                     val list = ArrayList<Song>()
                     ShuffleHelper.makeShuffleList(it, -1)

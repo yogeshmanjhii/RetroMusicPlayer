@@ -245,7 +245,7 @@ public final class PreferenceUtil {
     }
 
     public final String getArtistAlbumSortOrder() {
-        return mPreferences.getString(ARTIST_ALBUM_SORT_ORDER, SortOrder.ArtistAlbumSortOrder.ALBUM_YEAR);
+        return mPreferences.getString(ARTIST_ALBUM_SORT_ORDER, SortOrder.ArtistAlbumSortOrder.ALBUM_A_Z);
     }
 
     public final String getAlbumSortOrder() {

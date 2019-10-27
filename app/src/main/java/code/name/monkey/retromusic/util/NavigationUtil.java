@@ -70,7 +70,7 @@ public class NavigationUtil {
     }
 
     public static void goToArtistOptions(@NotNull AppCompatActivity activity,
-                                         int artistId,
+                                         long artistId,
                                          @NonNull ActivityOptions options) {
 
         Intent intent = new Intent(activity, ArtistDetailActivity.class);

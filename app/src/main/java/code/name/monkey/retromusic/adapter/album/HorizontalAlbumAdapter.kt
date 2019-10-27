@@ -1,18 +1,14 @@
 package code.name.monkey.retromusic.adapter.album
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
-import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.HorizontalAdapterHelper
 import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.util.MusicUtil
-import com.bumptech.glide.Glide
 import java.util.*
 
 
@@ -43,7 +39,7 @@ class HorizontalAlbumAdapter(
     override fun loadAlbumCover(album: Album, holder: ViewHolder) {
         if (holder.image == null) return
 
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+        /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(object : RetroMusicColoredTarget(holder.image!!) {
@@ -58,7 +54,7 @@ class HorizontalAlbumAdapter(
                         else
                             setColors(albumArtistFooterColor, holder)
                     }
-                })
+                })*/
     }
 
     override fun getAlbumText(album: Album): String? {

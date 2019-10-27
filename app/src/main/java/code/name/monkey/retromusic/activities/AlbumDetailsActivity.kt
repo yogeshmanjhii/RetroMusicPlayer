@@ -29,7 +29,6 @@ import code.name.monkey.retromusic.dialogs.DeleteSongsDialog
 import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SortOrder.AlbumSongSortOrder
 import code.name.monkey.retromusic.misc.AppBarStateChangeListener
@@ -37,8 +36,6 @@ import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.mvp.presenter.AlbumDetailsPresenter
 import code.name.monkey.retromusic.mvp.presenter.AlbumDetailsView
-import code.name.monkey.retromusic.util.MusicUtil
-import code.name.monkey.retromusic.util.NavigationUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.RetroUtil
 import com.bumptech.glide.Glide
@@ -51,6 +48,9 @@ import javax.inject.Inject
 import android.util.Pair as UtilPair
 
 class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
+    override fun showEmptyView() {
+
+    }
 
     private lateinit var simpleSongAdapter: SimpleSongAdapter
     private var disposable = CompositeDisposable()
@@ -93,20 +93,20 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
 
         artistImage.setOnClickListener {
             val artistPairs = ActivityOptions.makeSceneTransitionAnimation(this, UtilPair.create(artistImage, getString(R.string.transition_artist_image)))
-            NavigationUtil.goToArtistOptions(this, album.artistId, artistPairs)
+            //NavigationUtil.goToArtistOptions(this, album.artistId, artistPairs)
         }
         playAction.apply {
-            setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
+            //setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
         }
         shuffleAction.apply {
-            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(album.songs!!, true) }
+            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(album.songs!!, true) }
         }
 
 
         albumDetailsPresenter.attachView(this)
 
         if (intent.extras!!.containsKey(EXTRA_ALBUM_ID)) {
-            intent.extras?.getInt(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
+            intent.extras?.getLong(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
         } else {
             finish()
         }
@@ -171,18 +171,18 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
 
     override fun album(album: Album) {
 
-        if (album.songs!!.isEmpty()) {
+        /*if (album.songs!!.isEmpty()) {
             finish()
             return
-        }
+        }*/
         this.album = album
 
         albumTitle.text = album.title
-        albumText.text = String.format("%s • %s • %s", album.artistName, MusicUtil.getYearString(album.year), MusicUtil.getReadableDurationString(MusicUtil.getTotalDuration(this, album.songs)))
+        //albumText.text = String.format("%s • %s • %s", album.artistName, MusicUtil.getYearString(album.year), MusicUtil.getReadableDurationString(MusicUtil.getTotalDuration(this, album.songs)))
 
         loadAlbumCover()
-        simpleSongAdapter.swapDataSet(album.songs)
-        albumDetailsPresenter.loadMore(album.artistId)
+        //simpleSongAdapter.swapDataSet(album.songs)
+        //albumDetailsPresenter.loadMore(album.artistId)
     }
 
     private lateinit var artistImage: ImageView
@@ -210,7 +210,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
     }
 
     private fun loadAlbumCover() {
-        SongGlideRequest.Builder.from(Glide.with(this), album.safeGetFirstSong())
+        /*SongGlideRequest.Builder.from(Glide.with(this), album.safeGetFirstSong())
                 .checkIgnoreMediaStore(this)
                 .generatePalette(this).build()
                 .dontAnimate()
@@ -218,7 +218,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
                     override fun onColorReady(color: Int) {
                         setColors(color)
                     }
-                })
+                })*/
     }
 
     private fun scheduleStartPostponedTransition(image: ImageView) {
@@ -323,7 +323,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView {
 
     private fun reload() {
         if (intent.extras!!.containsKey(EXTRA_ALBUM_ID)) {
-            intent.extras?.getInt(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
+            intent.extras?.getLong(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
         } else {
             finish()
         }
