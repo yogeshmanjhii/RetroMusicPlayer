@@ -15,6 +15,7 @@
 package code.name.monkey.retromusic.dagger
 
 import code.name.monkey.retromusic.activities.*
+import code.name.monkey.retromusic.album.AlbumDetailsFragment
 import code.name.monkey.retromusic.dagger.module.*
 import code.name.monkey.retromusic.fragments.mainactivity.*
 import code.name.monkey.retromusic.fragments.mainactivity.home.BannerHomeFragment
@@ -59,4 +60,6 @@ interface MusicComponent {
     fun inject(searchActivity: SearchActivity)
 
     fun inject(bannerHomeFragment: BannerHomeFragment)
+
+    fun inject(albumDetailsFragment: AlbumDetailsFragment)
 }

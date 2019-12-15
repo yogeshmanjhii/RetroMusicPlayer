@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.NonNull
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
@@ -18,11 +16,17 @@ import kotlinx.android.synthetic.main.fragment_main_activity_recycler_view.*
 abstract class AbsLibraryPagerRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : RecyclerView.LayoutManager> : AbsLibraryPagerFragment(), AppBarLayout.OnOffsetChangedListener {
 
     protected var adapter: A? = null
+
     protected var layoutManager: LM? = null
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    protected abstract fun createLayoutManager(): LM
+
+    protected abstract fun createAdapter(): A
+
+    protected open val emptyMessage: Int
+        get() = R.string.empty
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main_activity_recycler_view, container, false)
     }
 
@@ -53,8 +57,6 @@ abstract class AbsLibraryPagerRecyclerViewFragment<A : RecyclerView.Adapter<*>, 
         })
     }
 
-    protected open val emptyMessage: Int
-        @StringRes get() = R.string.empty
 
     private fun getEmojiByUnicode(unicode: Int): String {
         return String(Character.toChars(unicode))
@@ -82,10 +84,6 @@ abstract class AbsLibraryPagerRecyclerViewFragment<A : RecyclerView.Adapter<*>, 
         layoutManager = createLayoutManager()
     }
 
-    protected abstract fun createLayoutManager(): LM
-
-    @NonNull
-    protected abstract fun createAdapter(): A
 
     override fun onOffsetChanged(p0: AppBarLayout?, i: Int) {
         container.setPadding(

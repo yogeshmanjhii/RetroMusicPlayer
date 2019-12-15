@@ -1,4 +1,4 @@
-package code.name.monkey.retromusic.adapter.album
+package code.name.monkey.retromusic.album.album
 
 import android.os.Bundle
 import android.view.*

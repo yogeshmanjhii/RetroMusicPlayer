@@ -117,6 +117,14 @@ class MainActivity : AbsSlidingMusicPanelActivity(), SharedPreferences.OnSharedP
         }
     }
 
+    fun setDetailsFragments(fragment: Fragment, tag: String) {
+        supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, fragment, tag)
+                .addToBackStack(tag)
+                .commit()
+        currentFragment = fragment as MainActivityFragmentCallbacks
+    }
+
     private fun restoreCurrentFragment() {
         currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MainActivityFragmentCallbacks
     }

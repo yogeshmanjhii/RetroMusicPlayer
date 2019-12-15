@@ -172,7 +172,7 @@ public class LibraryFragment extends AbsMainActivityFragment implements CabHolde
         return false;
     }
 
-    private void selectedFragment(Fragment fragment) {
+      void selectedFragment(Fragment fragment) {
         fragmentManager = getChildFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package code.name.monkey.retromusic.adapter.album
+package code.name.monkey.retromusic.album.album
 
 import android.app.*
 import android.util.DisplayMetrics

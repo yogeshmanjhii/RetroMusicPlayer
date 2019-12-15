@@ -1,4 +1,4 @@
-package code.name.monkey.retromusic.adapter.album
+package code.name.monkey.retromusic.album.album
 
 import android.app.ActivityOptions
 import android.content.res.ColorStateList
@@ -13,6 +13,7 @@ import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.AbsMultiSelectAdapter
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
+import code.name.monkey.retromusic.album.AlbumDetailsInterface
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
 import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
@@ -22,7 +23,6 @@ import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.MusicUtil
-import code.name.monkey.retromusic.util.NavigationUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -32,7 +32,8 @@ open class AlbumAdapter(
         dataSet: ArrayList<Album>,
         protected var itemLayoutRes: Int,
         usePalette: Boolean,
-        cabHolder: CabHolder?
+        cabHolder: CabHolder?,
+        private val albumDetailsInterface: AlbumDetailsInterface? = null
 ) : AbsMultiSelectAdapter<AlbumAdapter.ViewHolder, Album>(
         activity,
         cabHolder,
@@ -174,14 +175,11 @@ open class AlbumAdapter(
             if (isInQuickSelectMode) {
                 toggleChecked(adapterPosition)
             } else {
-                val activityOptions = ActivityOptions.makeSceneTransitionAnimation(
-                        activity, image, activity.getString(
+                val activityOptions = ActivityOptions.makeSceneTransitionAnimation(activity, image, activity.getString(
                         R.string.transition_album_art
-                )
-                )
-                NavigationUtil.goToAlbumOptions(
-                        activity, dataSet[adapterPosition].id, activityOptions
-                )
+                ))
+                albumDetailsInterface?.onAlbumClick(dataSet[adapterPosition].id)
+                //NavigationUtil.goToAlbumOptions(activity, dataSet[adapterPosition].id, activityOptions)
             }
         }
 

@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.ViewPager
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.adapter.album.AlbumCoverPagerAdapter
-import code.name.monkey.retromusic.adapter.album.AlbumCoverPagerAdapter.AlbumCoverFragment
+import code.name.monkey.retromusic.album.album.AlbumCoverPagerAdapter
+import code.name.monkey.retromusic.album.album.AlbumCoverPagerAdapter.AlbumCoverFragment
 import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.fragments.base.AbsMusicServiceFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote

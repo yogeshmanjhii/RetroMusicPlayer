@@ -5,7 +5,9 @@ import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.adapter.album.AlbumAdapter
+import code.name.monkey.retromusic.album.AlbumDetailsFragment
+import code.name.monkey.retromusic.album.AlbumDetailsInterface
+import code.name.monkey.retromusic.album.album.AlbumAdapter
 import code.name.monkey.retromusic.fragments.base.AbsLibraryPagerRecyclerViewCustomGridSizeFragment
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.mvp.presenter.AlbumsPresenter
@@ -13,7 +15,7 @@ import code.name.monkey.retromusic.mvp.presenter.AlbumsView
 import code.name.monkey.retromusic.util.PreferenceUtil
 import javax.inject.Inject
 
-open class AlbumsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<AlbumAdapter, GridLayoutManager>(), AlbumsView {
+open class AlbumsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<AlbumAdapter, GridLayoutManager>(), AlbumsView, AlbumDetailsInterface {
     @Inject
     lateinit var albumsPresenter: AlbumsPresenter
 
@@ -57,7 +59,7 @@ open class AlbumsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<Al
             itemLayoutRes = PreferenceUtil.getInstance(requireContext()).getAlbumGridStyle(requireContext())
         }
         val dataSet = if (adapter == null) ArrayList() else adapter!!.dataSet
-        return AlbumAdapter(libraryFragment.mainActivity, dataSet, itemLayoutRes, loadUsePalette(), libraryFragment)
+        return AlbumAdapter(libraryFragment.mainActivity, dataSet, itemLayoutRes, loadUsePalette(), libraryFragment, this)
     }
 
     public override fun loadUsePalette(): Boolean {
@@ -134,4 +136,7 @@ open class AlbumsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<Al
         }
     }
 
+    override fun onAlbumClick(albumId: Int) {
+        libraryFragment.mainActivity.setDetailsFragments(AlbumDetailsFragment.newInstance(albumId), "AlbumDetails")
+    }
 }
