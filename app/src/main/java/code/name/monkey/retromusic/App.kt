@@ -31,9 +31,6 @@ class App : MultiDexApplication() {
     lateinit var billingProcessor: BillingProcessor
 
     override fun onCreate() {
-       /* if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
-            return
-        }*/
         super.onCreate()
         instance = this
         musicComponent = DaggerMusicComponent.builder()

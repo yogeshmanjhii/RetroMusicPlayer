@@ -17,6 +17,7 @@ package code.name.monkey.retromusic.providers.interfaces
 import code.name.monkey.retromusic.Result
 import code.name.monkey.retromusic.model.*
 import code.name.monkey.retromusic.rest.model.LastFmArtist
+import code.name.monkey.retromusic.room.PlaylistEntity
 import io.reactivex.Observable
 
 /**
@@ -54,6 +55,8 @@ interface Repository {
     suspend fun artistInfo(name: String, lang: String?, cache: String?): Result<LastFmArtist>
 
     suspend fun artistById(artistId: Int): Result<Artist>
+
+    suspend fun playlistEntities(): List<PlaylistEntity>
 
     fun getSong(id: Int): Song
 

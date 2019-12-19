@@ -25,12 +25,19 @@ import code.name.monkey.retromusic.model.*
 import code.name.monkey.retromusic.providers.interfaces.Repository
 import code.name.monkey.retromusic.rest.LastFMRestClient
 import code.name.monkey.retromusic.rest.model.LastFmArtist
+import code.name.monkey.retromusic.room.PlaylistEntity
+import code.name.monkey.retromusic.room.PlaylistEntityRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.IOException
 
 class RepositoryImpl(private val context: Context) : Repository {
+    private val playlistEntityRepository: PlaylistEntityRepository = PlaylistEntityRepository(context)
+
+    fun insertSong(song: Song) {
+        playlistEntityRepository.insertSong(song)
+    }
 
     override suspend fun allAlbums(): Result<ArrayList<Album>> {
         return try {
@@ -245,6 +252,10 @@ class RepositoryImpl(private val context: Context) : Repository {
         } catch (e: Exception) {
             Error(Throwable("Error loading artist"))
         }
+    }
+
+    override suspend fun playlistEntities(): List<PlaylistEntity> {
+        return playlistEntityRepository.playlistEntries()
     }
 
     override fun getAlbumFlowable(albumId: Int): Observable<Album> {

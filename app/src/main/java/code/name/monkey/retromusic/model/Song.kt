@@ -14,22 +14,33 @@
 package code.name.monkey.retromusic.model
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 
+@Entity(tableName = "songs")
 @Parcelize
 open class Song(
-        val id: Int,
-        val title: String,
-        val trackNumber: Int,
-        val year: Int,
-        val duration: Long,
-        val data: String,
-        val dateModified: Long,
-        val albumId: Int,
-        val albumName: String,
-        val artistId: Int,
-        val artistName: String,
-        val composer: String?
+        @PrimaryKey
+        val id: Int = -1,
+        val title: String = "",
+        @ColumnInfo(name = "track_number")
+        val trackNumber: Int = -1,
+        val year: Int = -1,
+        val duration: Long = -1,
+        val data: String = "",
+        @ColumnInfo(name = "date_modified")
+        val dateModified: Long = -1,
+        @ColumnInfo(name = "album_id")
+        val albumId: Int = -1,
+        @ColumnInfo(name = "album_name")
+        val albumName: String = "",
+        @ColumnInfo(name = "artist_id")
+        val artistId: Int = -1,
+        @ColumnInfo(name = "artist_name")
+        val artistName: String = "",
+        val composer: String? = ""
 ) : Parcelable {
 
 
