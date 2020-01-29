@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.NonNull
 import androidx.annotation.StringRes
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.extensions.doOnApplyWindowInsets
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
-import code.name.monkey.retromusic.util.DensityUtil
 import code.name.monkey.retromusic.util.ThemedFastScroller.create
 import code.name.monkey.retromusic.views.ScrollingViewOnApplyWindowInsetsListener
 import com.google.android.material.appbar.AppBarLayout
@@ -84,7 +85,7 @@ abstract class AbsLibraryPagerRecyclerViewFragment<A : RecyclerView.Adapter<*>, 
     }
 
     private fun checkForPadding() {
-        val itemCount: Int = adapter?.itemCount ?: 0
+        /*val itemCount: Int = adapter?.itemCount ?: 0
         val params = container.layoutParams as ViewGroup.MarginLayoutParams
         if (itemCount > 0 && MusicPlayerRemote.playingQueue.isNotEmpty()) {
             val height = DensityUtil.dip2px(requireContext(), 104f)
@@ -92,6 +93,17 @@ abstract class AbsLibraryPagerRecyclerViewFragment<A : RecyclerView.Adapter<*>, 
         } else {
             val height = DensityUtil.dip2px(requireContext(), 52f)
             params.bottomMargin = height
+        }*/
+
+        val heightOfBar = resources.getDimensionPixelSize(R.dimen.mini_player_height)
+        val heightOfBarWithTabs = resources.getDimensionPixelSize(R.dimen.mini_player_height_expanded)
+
+        recyclerView.doOnApplyWindowInsets { view, windowInsets, initialPadding ->
+            view.updatePadding(
+                bottom = if (MusicPlayerRemote.playingQueue.isEmpty()) (windowInsets.systemWindowInsetBottom + initialPadding.bottom) else 0,
+                left = initialPadding.left + windowInsets.systemWindowInsetLeft,
+                right = initialPadding.right + windowInsets.systemWindowInsetRight
+            )
         }
     }
 

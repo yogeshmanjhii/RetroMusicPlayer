@@ -12,8 +12,10 @@ import androidx.fragment.app.Fragment
 import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.extensions.doOnApplyWindowInsets
 import code.name.monkey.retromusic.extensions.hide
 import code.name.monkey.retromusic.extensions.show
+import code.name.monkey.retromusic.extensions.updateMargins
 import code.name.monkey.retromusic.fragments.MiniPlayerFragment
 import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.fragments.NowPlayingScreen.ADAPTIVE
@@ -55,6 +57,7 @@ import code.name.monkey.retromusic.views.BottomNavigationBarTinted
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.sliding_music_panel_layout.bottomNavigationView
 import kotlinx.android.synthetic.main.sliding_music_panel_layout.dimBackground
+import kotlinx.android.synthetic.main.sliding_music_panel_layout.mainContent
 import kotlinx.android.synthetic.main.sliding_music_panel_layout.slidingPanel
 
 abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlayerFragment.Callbacks {
@@ -102,7 +105,8 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(createContentView())
-
+        mainContent.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         chooseFragmentForTheme()
         setupSlidingUpPanel()
 
@@ -112,6 +116,14 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
 
         val themeColor = ATHUtil.resolveColor(this, android.R.attr.windowBackground, Color.GRAY)
         dimBackground.setBackgroundColor(ColorUtil.withAlpha(themeColor, 0.5f))
+
+        bottomNavigationView.doOnApplyWindowInsets { view, windowInsets, initialPadding ->
+            view.updateMargins(
+                bottom = initialPadding.bottom + windowInsets.systemWindowInsetBottom,
+                left = initialPadding.left + windowInsets.systemWindowInsetLeft,
+                right = initialPadding.right + windowInsets.systemWindowInsetRight
+            )
+        }
     }
 
     override fun onResume() {
@@ -163,7 +175,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
         // restore values
         super.setLightStatusbar(lightStatusBar)
         super.setTaskDescriptionColor(taskColor)
-        super.setNavigationbarColor(navigationBarColor)
+        super.setNavigationbarColor(Color.TRANSPARENT)
         super.setLightNavigationBar(lightNavigationBar)
 
 
@@ -194,7 +206,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
                 when (panelState) {
                     BottomSheetBehavior.STATE_EXPANDED -> onPanelExpanded()
                     BottomSheetBehavior.STATE_COLLAPSED -> onPanelCollapsed()
-                    else -> playerFragment!!.onHide()
+                    else -> playerFragment?.onHide()
                 }
             }
         })
@@ -222,8 +234,13 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
                 slidingPanel.cardElevation = DensityUtil.dip2px(this, 10f).toFloat()
                 bottomNavigationView.elevation = DensityUtil.dip2px(this, 10f).toFloat()
                 bottomSheetBehavior.isHideable = false
-                bottomSheetBehavior.peekHeight =
-                    if (bottomNavigationView.visibility == View.VISIBLE) heightOfBarWithTabs else heightOfBar
+                /*bottomSheetBehavior.peekHeight =
+                    if (bottomNavigationView.visibility == View.VISIBLE) heightOfBarWithTabs else heightOfBar*/
+
+                slidingPanel.doOnApplyWindowInsets { view, windowInsets, initialPadding ->
+                    bottomSheetBehavior.peekHeight =
+                        windowInsets.systemWindowInsetBottom + if (bottomNavigationView.visibility == View.VISIBLE) heightOfBarWithTabs else heightOfBar
+                }
             }
         }
     }
@@ -306,6 +323,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
             } else if (currentNowPlayingScreen == FULL || currentNowPlayingScreen == CARD || currentNowPlayingScreen == FIT || currentNowPlayingScreen == BLUR || currentNowPlayingScreen == BLUR_CARD) {
                 super.setLightStatusbar(false)
                 super.setLightNavigationBar(true)
+                super.setNavigationbarColor(Color.TRANSPARENT)
             } else if (currentNowPlayingScreen == COLOR || currentNowPlayingScreen == TINY) {
                 super.setNavigationbarColor(paletteColor)
                 super.setLightNavigationBar(isColorLight)
@@ -315,7 +333,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
                     ColorUtil.isColorLight(
                         ATHUtil.resolveColor(
                             this,
-                            android.R.attr.windowBackground
+                            R.attr.colorSurface
                         )
                     )
                 )
@@ -342,7 +360,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(), AbsPlay
         navigationBarColor = color
         if (panelState == BottomSheetBehavior.STATE_COLLAPSED) {
             if (navigationBarColorAnimator != null) navigationBarColorAnimator!!.cancel()
-            super.setNavigationbarColor(color)
+            //super.setNavigationbarColor(color)
         }
     }
 

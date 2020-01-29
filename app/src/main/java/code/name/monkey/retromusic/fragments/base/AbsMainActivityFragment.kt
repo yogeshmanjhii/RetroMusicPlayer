@@ -18,7 +18,7 @@ abstract class AbsMainActivityFragment : AbsMusicServiceFragment() {
         super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
 
-        mainActivity.setNavigationbarColorAuto()
+        //mainActivity.setNavigationbarColorAuto()
         mainActivity.setLightNavigationBar(true)
         mainActivity.setTaskDescriptionColorAuto()
         mainActivity.hideStatusBar()
