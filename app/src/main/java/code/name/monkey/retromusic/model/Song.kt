@@ -13,12 +13,14 @@
  */
 package code.name.monkey.retromusic.model
 
+import android.database.Cursor
 import android.os.Parcelable
+import android.provider.MediaStore.Audio.Media
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 open class Song(
-    val id: Int,
+    val id: Long,
     val title: String,
     val trackNumber: Int,
     val year: Int,
@@ -27,7 +29,7 @@ open class Song(
     val dateModified: Long,
     val albumId: Int,
     val albumName: String,
-    val artistId: Int,
+    val artistId: Long,
     val artistName: String,
     val composer: String?
 ) : Parcelable {
@@ -49,5 +51,22 @@ open class Song(
             "",
             ""
         )
+
+        fun fromCursor(cursor: Cursor, artistId: Long): Any {
+            return Song(
+                id = cursor.value(Media._ID),
+                albumId = cursor.value(Media.ALBUM_ID),
+                artistId = cursor.value(Media.ARTIST_ID),
+                albumName = cursor.valueOrEmpty(Media.ALBUM),
+                artistName = cursor.valueOrEmpty(Media.ARTIST),
+                composer = cursor.valueOrEmpty(Media.COMPOSER),
+                data = cursor.valueOrEmpty(Media.DATA),
+                dateModified = cursor.value(Media.DATE_ADDED),
+                duration = cursor.value(Media.DURATION),
+                title = cursor.valueOrEmpty(Media.TITLE),
+                trackNumber = cursor.value(Media.TRACK),
+                year = cursor.value(Media.YEAR)
+            )
+        }
     }
 }

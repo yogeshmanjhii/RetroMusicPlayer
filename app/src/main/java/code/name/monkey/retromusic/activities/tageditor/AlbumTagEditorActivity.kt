@@ -19,7 +19,6 @@ import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.extensions.applyToolbar
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteTranscoder
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteWrapper
-import code.name.monkey.retromusic.loaders.AlbumLoader
 import code.name.monkey.retromusic.rest.LastFMRestClient
 import code.name.monkey.retromusic.util.ImageUtil
 import code.name.monkey.retromusic.util.RetroColorUtil.generatePalette
@@ -39,7 +38,6 @@ import kotlinx.android.synthetic.main.activity_album_tag_editor.toolbar
 import kotlinx.android.synthetic.main.activity_album_tag_editor.yearContainer
 import kotlinx.android.synthetic.main.activity_album_tag_editor.yearTitle
 import org.jaudiotagger.tag.FieldKey
-import java.util.ArrayList
 import java.util.EnumMap
 
 class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
@@ -183,12 +181,13 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
     }
 
     override fun getSongPaths(): List<String> {
-        val songs = AlbumLoader.getAlbum(this, id).songs
-        val paths = ArrayList<String>(songs!!.size)
-        for (song in songs) {
-            paths.add(song.data)
-        }
-        return paths
+        //val songs = AlbumLoader.getAlbum(this, id).songs
+        //val paths = ArrayList<String>(songs!!.size)
+        //for (song in songs) {
+          //  paths.add(song.data)
+        //}
+        //return paths
+        return emptyList()
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {

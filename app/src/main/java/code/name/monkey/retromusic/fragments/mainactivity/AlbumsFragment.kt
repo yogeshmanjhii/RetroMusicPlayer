@@ -41,7 +41,7 @@ open class AlbumsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<Al
         albumsPresenter.detachView()
     }
 
-    override fun albums(albums: java.util.ArrayList<Album>) {
+    override fun albums(albums:  List<Album>) {
         adapter?.swapDataSet(albums)
     }
 

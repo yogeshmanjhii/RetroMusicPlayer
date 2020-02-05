@@ -30,9 +30,9 @@ import code.name.monkey.retromusic.rest.model.LastFmArtist
 
 interface Repository {
 
-    suspend fun allAlbums(): Result<ArrayList<Album>>
+    suspend fun allAlbums(): Result<List<Album>>
 
-    suspend fun albumById(albumId: Int): Result<Album>
+    suspend fun albumById(albumId: Long): Result<Album>
 
     suspend fun allSongs(): Result<ArrayList<Song>>
 
@@ -62,5 +62,5 @@ interface Repository {
 
     suspend fun albumInfo(artist: String, album: String): Result<LastFmAlbum>
 
-    suspend fun artistById(artistId: Int): Result<Artist>
+    suspend fun artistById(artistId: Long): Result<Artist>
 }

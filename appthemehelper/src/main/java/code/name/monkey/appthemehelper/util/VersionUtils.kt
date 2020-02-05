@@ -42,4 +42,8 @@ object VersionUtils {
     fun hasOreo(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
+
+    fun hasQ(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
 }

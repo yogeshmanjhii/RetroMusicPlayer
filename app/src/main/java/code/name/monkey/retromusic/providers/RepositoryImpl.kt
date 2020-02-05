@@ -45,7 +45,7 @@ import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(private val context: Context) : Repository {
 
-    override suspend fun allAlbums(): Result<ArrayList<Album>> {
+    override suspend fun allAlbums(): Result<List<Album>> {
         return try {
             val albums = AlbumLoader.getAllAlbums(context)
             if (albums.isNotEmpty()) {
@@ -58,14 +58,10 @@ class RepositoryImpl @Inject constructor(private val context: Context) : Reposit
         }
     }
 
-    override suspend fun albumById(albumId: Int): Result<Album> {
+    override suspend fun albumById(albumId: Long): Result<Album> {
         return try {
             val album = AlbumLoader.getAlbum(context, albumId)
-            if (album != null) {
-                Success(album)
-            } else {
-                Error(Throwable("No album"))
-            }
+            Success(album)
         } catch (e: Exception) {
             Error(e)
         }
@@ -289,7 +285,7 @@ class RepositoryImpl @Inject constructor(private val context: Context) : Reposit
         errorMessage = "Error"
     )
 
-    override suspend fun artistById(artistId: Int): Result<Artist> {
+    override suspend fun artistById(artistId: Long): Result<Artist> {
         return try {
             val artist = ArtistLoader.getArtist(context, artistId)
             return Success(artist)

@@ -43,10 +43,10 @@ object LastAddedSongsLoader {
     }
 
     fun getLastAddedAlbums(context: Context): ArrayList<Album> {
-        return AlbumLoader.splitIntoAlbums(getLastAddedSongs(context))
+        return ArrayList()
     }
 
     fun getLastAddedArtists(context: Context): ArrayList<Artist> {
-        return ArtistLoader.splitIntoArtists(getLastAddedAlbums(context))
+        return ArrayList()
     }
 }

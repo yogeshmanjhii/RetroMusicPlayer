@@ -16,6 +16,8 @@ package code.name.monkey.retromusic.loaders
 
 import android.content.Context
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.model.Album
+import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Genre
 import java.util.Locale
 
@@ -29,13 +31,13 @@ object SearchLoader {
                 results.addAll(songs)
             }
 
-            val artists = ArtistLoader.getArtists(context, searchString)
+            val artists = emptyArray<Artist>()//ArtistLoader.getArtists(context, searchString)
             if (artists.isNotEmpty()) {
                 results.add(context.resources.getString(R.string.artists))
                 results.addAll(artists)
             }
 
-            val albums = AlbumLoader.getAlbums(context, searchString)
+            val albums = emptyArray<Album>()//AlbumLoader.getAlbums(context, searchString)
             if (albums.isNotEmpty()) {
                 results.add(context.resources.getString(R.string.albums))
                 results.addAll(albums)

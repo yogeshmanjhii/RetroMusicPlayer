@@ -111,7 +111,7 @@ abstract class AbsPlayerFragment : AbsMusicServiceFragment(),
                 return true
             }
             R.id.action_go_to_artist -> {
-                NavigationUtil.goToArtist(requireActivity(), song.artistId)
+                NavigationUtil.goToArtist(requireActivity(), song.artistId.toInt())
                 return true
             }
             R.id.now_playing -> {

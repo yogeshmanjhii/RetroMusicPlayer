@@ -66,7 +66,7 @@ public class NavigationUtil {
     }
 
     public static void goToAlbumOptions(@NonNull Activity activity,
-            int albumId,
+            long albumId,
             @NonNull ActivityOptions options) {
         Intent intent = new Intent(activity, AlbumDetailsActivity.class);
         intent.putExtra(AlbumDetailsActivity.EXTRA_ALBUM_ID, albumId);
@@ -80,7 +80,7 @@ public class NavigationUtil {
     }
 
     public static void goToArtistOptions(@NotNull Activity activity,
-            int artistId,
+            long artistId,
             @NonNull ActivityOptions options) {
 
         Intent intent = new Intent(activity, ArtistDetailActivity.class);

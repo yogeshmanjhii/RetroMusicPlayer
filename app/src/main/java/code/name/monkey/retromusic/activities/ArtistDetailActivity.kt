@@ -22,14 +22,14 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.base.AbsSlidingMusicPanelActivity
 import code.name.monkey.retromusic.adapter.album.HorizontalAlbumAdapter
 import code.name.monkey.retromusic.adapter.song.SimpleSongAdapter
-import code.name.monkey.retromusic.dialogs.AddToPlaylistDialog
 import code.name.monkey.retromusic.extensions.ripAlpha
 import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.CabHolder
+import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.presenter.ArtistDetailsPresenter
 import code.name.monkey.retromusic.mvp.presenter.ArtistDetailsView
 import code.name.monkey.retromusic.rest.model.LastFmArtist
@@ -118,7 +118,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         artistDetailsPresenter.attachView(this)
 
         if (intent.extras!!.containsKey(EXTRA_ARTIST_ID)) {
-            intent.extras?.getInt(EXTRA_ARTIST_ID)?.let {
+            intent.extras?.getLong(EXTRA_ARTIST_ID)?.let {
                 artistDetailsPresenter.loadArtist(it)
                 val name = "${getString(R.string.transition_artist_image)}_$it"
                 artistCoverContainer?.transitionName = name
@@ -133,10 +133,10 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         setupRecyclerView()
 
         playAction.apply {
-            setOnClickListener { MusicPlayerRemote.openQueue(artist.songs, 0, true) }
+            //setOnClickListener { MusicPlayerRemote.openQueue(artist.songs, 0, true) }
         }
         shuffleAction.apply {
-            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(artist.songs, true) }
+            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(artist.songs, true) }
         }
 
         biographyText.setOnClickListener {
@@ -189,6 +189,14 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         ActivityCompat.startPostponedEnterTransition(this)
     }
 
+    override fun songs(songs: ArrayList<Song>) {
+        songAdapter.swapDataSet(songs)
+    }
+
+    override fun albums(albums: List<Album>) {
+        albumAdapter.swapDataSet(ArrayList(albums))
+    }
+
     override fun artist(artist: Artist) {
         complete()
         if (artist.songCount <= 0) {
@@ -202,13 +210,12 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         }
         artistTitle.text = artist.name
         text.text = String.format(
-            "%s • %s",
-            MusicUtil.getArtistInfoString(this, artist),
-            MusicUtil.getReadableDurationString(MusicUtil.getTotalDuration(artist.songs))
+            "%s",
+            MusicUtil.getArtistInfoString(this, artist)
         )
-
-        songAdapter.swapDataSet(artist.songs)
-        albumAdapter.swapDataSet(artist.albums!!)
+        artistDetailsPresenter.loadArtistAlbums(artist.id)
+        artistDetailsPresenter.loadArtistSongs(artist.id)
+        //albumAdapter.swapDataSet(artist.albums!!)
     }
 
     private fun loadBiography(
@@ -304,22 +311,22 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
     }
 
     private fun handleSortOrderMenuItem(item: MenuItem): Boolean {
-        val songs = artist.songs
+        //val songs = artist.songs
         when (item.itemId) {
             android.R.id.home -> {
                 super.onBackPressed()
                 return true
             }
             R.id.action_play_next -> {
-                MusicPlayerRemote.playNext(songs)
+                //MusicPlayerRemote.playNext(songs)
                 return true
             }
             R.id.action_add_to_current_playing -> {
-                MusicPlayerRemote.enqueue(songs)
+                //MusicPlayerRemote.enqueue(songs)
                 return true
             }
             R.id.action_add_to_playlist -> {
-                AddToPlaylistDialog.create(songs).show(supportFragmentManager, "ADD_PLAYLIST")
+                //AddToPlaylistDialog.create(songs).show(supportFragmentManager, "ADD_PLAYLIST")
                 return true
             }
             R.id.action_set_artist_image -> {
@@ -354,7 +361,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
 
     private fun reload() {
         if (intent.extras!!.containsKey(EXTRA_ARTIST_ID)) {
-            intent.extras?.getInt(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
+            intent.extras?.getLong(EXTRA_ARTIST_ID)?.let { artistDetailsPresenter.loadArtist(it) }
         } else {
             finish()
         }

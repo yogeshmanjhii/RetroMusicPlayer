@@ -14,9 +14,12 @@
 
 package code.name.monkey.retromusic.mvp.presenter
 
+import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.Result.Success
+import code.name.monkey.retromusic.loaders.AlbumLoader
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.Presenter
 import code.name.monkey.retromusic.mvp.PresenterImpl
 import code.name.monkey.retromusic.providers.interfaces.Repository
@@ -36,6 +39,8 @@ interface AlbumDetailsView {
 
     fun album(album: Album)
 
+    fun songs(songs: ArrayList<Song>)
+
     fun complete()
 
     fun loadArtistImage(artist: Artist)
@@ -48,9 +53,12 @@ interface AlbumDetailsView {
 }
 
 interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
-    fun loadAlbum(albumId: Int)
+    fun loadAlbum(albumId: Long)
 
-    fun loadMore(artistId: Int)
+    fun albumSong(albumId: Long)
+
+    fun loadMore(artistId: Long)
+
     fun aboutAlbum(artist: String, album: String)
 
     class AlbumDetailsPresenterImpl @Inject constructor(
@@ -60,7 +68,7 @@ interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
         private val job = Job()
         private lateinit var album: Album
 
-        override fun loadMore(artistId: Int) {
+        override fun loadMore(artistId: Long) {
             launch {
                 when (val result = repository.artistById(artistId)) {
                     is Success -> withContext(Dispatchers.Main) { showArtistImage(result.data) }
@@ -81,12 +89,12 @@ interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
         private fun showArtistImage(artist: Artist) {
             view?.loadArtistImage(artist)
 
-            artist.albums?.filter { it.id != album.id }?.let {
+           /* artist.albums?.filter { it.id != album.id }?.let {
                 if (it.isNotEmpty()) view?.moreAlbums(ArrayList(it))
-            }
+            }*/
         }
 
-        override fun loadAlbum(albumId: Int) {
+        override fun loadAlbum(albumId: Long) {
             launch {
                 when (val result = repository.albumById(albumId)) {
                     is Success -> withContext(Dispatchers.Main) {
@@ -94,6 +102,15 @@ interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
                         view?.album(result.data)
                     }
                     is Error -> withContext(Dispatchers.Main) { view?.complete() }
+                }
+            }
+        }
+
+        override fun albumSong(albumId: Long) {
+            launch {
+                val songs = AlbumLoader.getSongsForAlbum(App.getContext(), albumId)
+                withContext(Dispatchers.Main) {
+                    view.songs(songs)
                 }
             }
         }

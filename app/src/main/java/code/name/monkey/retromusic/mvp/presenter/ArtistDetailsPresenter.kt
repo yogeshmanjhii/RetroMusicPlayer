@@ -14,8 +14,12 @@
 
 package code.name.monkey.retromusic.mvp.presenter
 
+import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.Result
+import code.name.monkey.retromusic.loaders.AlbumLoader
+import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.BaseView
 import code.name.monkey.retromusic.mvp.Presenter
 import code.name.monkey.retromusic.mvp.PresenterImpl
@@ -35,14 +39,24 @@ import kotlin.coroutines.CoroutineContext
  */
 interface ArtistDetailsView : BaseView {
 
+    fun songs(songs: ArrayList<Song>)
+
+    fun albums(albums: List<Album>)
+
     fun artist(artist: Artist)
+
     fun artistInfo(lastFmArtist: LastFmArtist?)
+
     fun complete()
 }
 
 interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
 
-    fun loadArtist(artistId: Int)
+    fun loadArtist(artistId: Long)
+
+    fun loadArtistSongs(artistId: Long)
+
+    fun loadArtistAlbums(artistId: Long)
 
     fun loadBiography(
         name: String,
@@ -72,7 +86,7 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
             }
         }
 
-        override fun loadArtist(artistId: Int) {
+        override fun loadArtist(artistId: Long) {
             launch {
                 when (val result = repository.artistById(artistId)) {
                     is Result.Success -> withContext(Dispatchers.Main) {
@@ -82,6 +96,24 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
                     is Result.Error -> withContext(Dispatchers.Main) {
                         view?.showEmptyView()
                     }
+                }
+            }
+        }
+
+        override fun loadArtistSongs(artistId: Long) {
+            launch {
+                val songs = AlbumLoader.getSongsForAlbum(App.getContext(), artistId)
+                withContext(Dispatchers.Main) {
+                    view.songs(songs)
+                }
+            }
+        }
+
+        override fun loadArtistAlbums(artistId: Long) {
+            launch {
+                val albums = AlbumLoader.getAlbumsForArtist(App.getContext(), artistId)
+                withContext(Dispatchers.Main) {
+                    view.albums(albums)
                 }
             }
         }

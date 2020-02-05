@@ -91,7 +91,7 @@ object SongMenuHelper {
                 return true
             }
             R.id.action_go_to_artist -> {
-                NavigationUtil.goToArtist(activity, song.artistId)
+                NavigationUtil.goToArtist(activity, song.artistId.toInt())
                 return true
             }
         }

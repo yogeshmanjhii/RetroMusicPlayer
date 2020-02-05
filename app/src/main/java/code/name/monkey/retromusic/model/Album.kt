@@ -14,41 +14,69 @@
 
 package code.name.monkey.retromusic.model
 
-import java.util.ArrayList
+import android.database.Cursor
+import android.provider.MediaStore.Audio.Albums.ALBUM
+import android.provider.MediaStore.Audio.Albums.ARTIST
+import android.provider.MediaStore.Audio.Albums.FIRST_YEAR
+import android.provider.MediaStore.Audio.Albums.NUMBER_OF_SONGS
+import android.provider.MediaStore.Audio.Albums._ID
+import android.provider.MediaStore.Audio.Artists.Albums.ALBUM_ID
+import code.name.monkey.appthemehelper.util.VersionUtils
 
-class Album {
-    val songs: ArrayList<Song>?
+data class Album(
+    var id: Long = 0,
+    var title: String = "",
+    var artist: String = "",
+    var artistId: Long = 0,
+    var songCount: Int = 0,
+    var year: Int = 0
+) {
 
-    val id: Int
-        get() = safeGetFirstSong().albumId
-
-    val title: String?
-        get() = safeGetFirstSong().albumName
-
-    val artistId: Int
-        get() = safeGetFirstSong().artistId
-
-    val artistName: String?
-        get() = safeGetFirstSong().artistName
-
-    val year: Int
-        get() = safeGetFirstSong().year
-
-    val dateModified: Long
-        get() = safeGetFirstSong().dateModified
-
-    val songCount: Int
-        get() = songs!!.size
-
-    constructor(songs: ArrayList<Song>) {
-        this.songs = songs
+    companion object {
+        fun fromCursor(cursor: Cursor, artistId: Long = -1): Album {
+            return Album(
+                id = cursor.value(if (VersionUtils.hasQ()) ALBUM_ID else _ID),
+                title = cursor.valueOrEmpty(ALBUM),
+                artist = cursor.valueOrEmpty(ARTIST),
+                artistId = artistId,
+                songCount = cursor.value(NUMBER_OF_SONGS),
+                year = cursor.value(FIRST_YEAR)
+            )
+        }
     }
+}
 
-    constructor() {
-        this.songs = ArrayList()
+fun Cursor.valueOrEmpty(name: String): String = valueOrDefault(name, "")
+
+inline fun <reified T> Cursor.value(name: String): T {
+    val index = getColumnIndexOrThrow(name)
+    return when (T::class) {
+        Short::class -> getShort(index) as T
+        Int::class -> getInt(index) as T
+        Long::class -> getLong(index) as T
+        Boolean::class -> (getInt(index) == 1) as T
+        String::class -> getString(index) as T
+        Float::class -> getFloat(index) as T
+        Double::class -> getDouble(index) as T
+        ByteArray::class -> getBlob(index) as T
+        else -> throw IllegalStateException("What do I do with ${T::class.java.simpleName}?")
     }
+}
 
-    fun safeGetFirstSong(): Song {
-        return if (songs!!.isEmpty()) Song.emptySong else songs[0]
+inline fun <reified T> Cursor.valueOrDefault(name: String, defaultValue: T): T {
+    val index = getColumnIndex(name)
+    if (index == -1) {
+        return defaultValue
+    }
+    return when (T::class) {
+        Short::class -> getShort(index) as? T ?: defaultValue
+        Int::class -> getInt(index) as? T ?: defaultValue
+        Long::class -> getLong(index) as? T ?: defaultValue
+        Boolean::class -> (getInt(index) == 1) as T
+        String::class -> getString(index) as? T ?: defaultValue
+        Float::class -> getFloat(index) as? T ?: defaultValue
+        Double::class -> getDouble(index) as? T ?: defaultValue
+        ByteArray::class -> getBlob(index) as? T ?: defaultValue
+        else -> throw IllegalStateException("What do I do with ${T::class.java.simpleName}?")
     }
 }

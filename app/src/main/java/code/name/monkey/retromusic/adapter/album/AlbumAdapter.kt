@@ -2,7 +2,6 @@ package code.name.monkey.retromusic.adapter.album
 
 import android.app.ActivityOptions
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -13,9 +12,8 @@ import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.AbsMultiSelectAdapter
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
+import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.helper.menu.SongsMenuHelper
 import code.name.monkey.retromusic.interfaces.CabHolder
@@ -29,7 +27,7 @@ import me.zhanghai.android.fastscroll.PopupTextProvider
 
 open class AlbumAdapter(
     protected val activity: AppCompatActivity,
-    dataSet: ArrayList<Album>,
+    dataSet: List<Album>,
     protected var itemLayoutRes: Int,
     usePalette: Boolean,
     cabHolder: CabHolder?
@@ -39,7 +37,7 @@ open class AlbumAdapter(
     R.menu.menu_media_selection
 ), PopupTextProvider {
 
-    var dataSet: ArrayList<Album>
+    var dataSet: List<Album>
         protected set
 
     protected var usePalette = false
@@ -60,7 +58,7 @@ open class AlbumAdapter(
         notifyDataSetChanged()
     }
 
-    fun swapDataSet(dataSet: ArrayList<Album>) {
+    fun swapDataSet(dataSet: List<Album>) {
         this.dataSet = dataSet
         notifyDataSetChanged()
     }
@@ -79,7 +77,7 @@ open class AlbumAdapter(
     }
 
     protected open fun getAlbumText(album: Album): String? {
-        return album.artistName
+        return album.artist
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -89,13 +87,13 @@ open class AlbumAdapter(
         holder.title?.text = getAlbumTitle(album)
         holder.text?.text = getAlbumText(album)
         holder.playSongs?.setOnClickListener {
-            album.songs?.let { songs ->
+            /*album.songs?.let { songs ->
                 MusicPlayerRemote.openQueue(
                     songs,
                     0,
                     true
                 )
-            }
+            }*/
         }
         loadAlbumCover(album, holder)
     }
@@ -123,15 +121,12 @@ open class AlbumAdapter(
         if (holder.image == null) {
             return
         }
-
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
-            .checkIgnoreMediaStore(activity).generatePalette(activity).build()
+        AlbumGlideRequest.Builder(Glide.with(activity), album.id)
+            .generatePalette(activity)
+            .build()
+            .dontAnimate()
+            .dontTransform()
             .into(object : RetroMusicColoredTarget(holder.image!!) {
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    super.onLoadCleared(placeholder)
-                    setColors(defaultFooterColor, holder)
-                }
-
                 override fun onColorReady(color: Int) {
                     setColors(color, holder)
                 }
@@ -143,7 +138,7 @@ open class AlbumAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return dataSet[position].id.toLong()
+        return dataSet[position].id
     }
 
     override fun getIdentifier(position: Int): Album? {
@@ -163,7 +158,7 @@ open class AlbumAdapter(
     private fun getSongList(albums: List<Album>): ArrayList<Song> {
         val songs = ArrayList<Song>()
         for (album in albums) {
-            songs.addAll(album.songs!!)
+            //songs.addAll(album.songs!!)
         }
         return songs
     }
@@ -177,7 +172,7 @@ open class AlbumAdapter(
         when (PreferenceUtil.getInstance(activity).albumSortOrder) {
             SortOrder.AlbumSortOrder.ALBUM_A_Z, SortOrder.AlbumSortOrder.ALBUM_Z_A -> sectionName =
                 dataSet[position].title
-            SortOrder.AlbumSortOrder.ALBUM_ARTIST -> sectionName = dataSet[position].artistName
+            SortOrder.AlbumSortOrder.ALBUM_ARTIST -> sectionName = dataSet[position].artist
             SortOrder.AlbumSortOrder.ALBUM_YEAR -> return MusicUtil.getYearString(
                 dataSet[position].year
             )

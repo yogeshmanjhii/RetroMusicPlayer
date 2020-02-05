@@ -14,18 +14,27 @@
 
 package code.name.monkey.retromusic.model
 
-import code.name.monkey.retromusic.util.MusicUtil
-import java.util.ArrayList
+import android.database.Cursor
+import android.provider.MediaStore.Audio.Artists.ARTIST
+import android.provider.MediaStore.Audio.Artists.NUMBER_OF_ALBUMS
+import android.provider.MediaStore.Audio.Artists.NUMBER_OF_TRACKS
+import android.provider.MediaStore.Audio.Artists._ID
 
-class Artist {
-    val albums: ArrayList<Album>?
+class Artist(
+    var id: Long = 0,
+    var name: String = "",
+    var songCount: Int = 0,
+    var albumCount: Int = 0
+) {
+
+    /*val albums: ArrayList<Album>?
 
     val id: Int
         get() = safeGetFirstAlbum().artistId
 
     val name: String
         get() {
-            val name = safeGetFirstAlbum().artistName
+            val name = safeGetFirstAlbum().artist
             return if (MusicUtil.isArtistNameUnknown(name)) {
                 UNKNOWN_ARTIST_DISPLAY_NAME
             } else name!!
@@ -47,7 +56,7 @@ class Artist {
         get() {
             val songs = ArrayList<Song>()
             for (album in albums!!) {
-                songs.addAll(album.songs!!)
+                //songs.addAll(album.songs!!)
             }
             return songs
         }
@@ -63,8 +72,18 @@ class Artist {
     fun safeGetFirstAlbum(): Album {
         return if (albums!!.isEmpty()) Album() else albums[0]
     }
-
+*/
     companion object {
+
+        fun fromCursor(cursor: Cursor): Artist {
+            return Artist(
+                id = cursor.value(_ID),
+                name = cursor.value(ARTIST),
+                songCount = cursor.value(NUMBER_OF_TRACKS),
+                albumCount = cursor.value(NUMBER_OF_ALBUMS)
+            )
+        }
+
         const val UNKNOWN_ARTIST_DISPLAY_NAME = "Unknown Artist"
     }
 }

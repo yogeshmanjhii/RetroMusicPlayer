@@ -63,7 +63,7 @@ open class PlaylistSongAdapter(
                     imageContainerCard ?: image,
                     "${activity.getString(R.string.transition_album_art)}_${song.albumId}"
                 )
-                NavigationUtil.goToAlbumOptions(activity, song.albumId, activityOptions)
+                NavigationUtil.goToAlbumOptions(activity, song.albumId.toLong(), activityOptions)
                 return true
             }
             return super.onSongMenuItemClick(item)

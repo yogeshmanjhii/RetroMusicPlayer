@@ -15,14 +15,16 @@
 package code.name.monkey.retromusic.loaders
 
 import android.content.Context
-import android.provider.MediaStore.Audio.AudioColumns
-import code.name.monkey.retromusic.model.Album
+import android.database.Cursor
+import android.provider.MediaStore
+import code.name.monkey.retromusic.Constants.baseProjection
+import code.name.monkey.retromusic.extensions.mapList
+import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Artist
-import code.name.monkey.retromusic.util.PreferenceUtil
-
+import code.name.monkey.retromusic.model.Song
 
 object ArtistLoader {
-    private fun getSongLoaderSortOrder(context: Context): String {
+    /*private fun getSongLoaderSortOrder(context: Context): String {
         return PreferenceUtil.getInstance(context).artistSortOrder + ", " + PreferenceUtil.getInstance(context).artistAlbumSortOrder + ", " + PreferenceUtil.getInstance(context).albumSongSortOrder
     }
 
@@ -32,7 +34,7 @@ object ArtistLoader {
                 null, null,
                 getSongLoaderSortOrder(context))
         )
-        return splitIntoArtists(AlbumLoader.splitIntoAlbums(songs))
+        return splitIntoArtists(null)
     }
 
     fun getArtists(context: Context, query: String): ArrayList<Artist> {
@@ -42,7 +44,7 @@ object ArtistLoader {
                 arrayOf("%$query%"),
                 getSongLoaderSortOrder(context))
         )
-        return splitIntoArtists(AlbumLoader.splitIntoAlbums(songs))
+        return splitIntoArtists(null)
     }
 
     fun splitIntoArtists(albums: ArrayList<Album>?): ArrayList<Artist> {
@@ -57,9 +59,9 @@ object ArtistLoader {
 
     private fun getOrCreateArtist(artists: ArrayList<Artist>, artistId: Int): Artist {
         for (artist in artists) {
-            if (artist.albums!!.isNotEmpty() && artist.albums[0].songs!!.isNotEmpty() && artist.albums[0].songs!![0].artistId == artistId) {
+            *//*if (artist.albums!!.isNotEmpty() && artist.albums[0].songs!!.isNotEmpty() && artist.albums[0].songs!![0].artistId == artistId) {
                 return artist
-            }
+            }*//*
         }
         val album = Artist()
         artists.add(album)
@@ -73,6 +75,66 @@ object ArtistLoader {
                 arrayOf(artistId.toString()),
                 getSongLoaderSortOrder(context))
         )
-        return Artist(AlbumLoader.splitIntoAlbums(songs))
+        return Artist(ArrayList())
+    }*/
+
+    fun getAllArtists(context: Context): ArrayList<Artist> {
+        return getArtists(makeArtistCursor(context, null, null))
+    }
+
+    fun getArtist(context: Context, artistId: Long): Artist {
+        return getArtist(makeArtistCursor(context, "_id=?", arrayOf(artistId.toString())))
+    }
+
+    private fun getArtist(cursor: Cursor?): Artist {
+        return cursor?.use {
+            if (cursor.moveToFirst()) {
+                Artist.fromCursor(cursor)
+            } else {
+                null
+            }
+        } ?: Artist()
+    }
+
+    private fun getArtists(cursor: Cursor?): ArrayList<Artist> {
+        val artists = ArrayList<Artist>()
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                artists.add(getArtistFromCursor(cursor))
+            } while (cursor.moveToNext())
+        }
+        return artists
+    }
+
+    private fun getArtistFromCursor(cursor: Cursor): Artist {
+        return Artist.fromCursor(cursor)
+    }
+
+    private fun makeArtistCursor(context: Context, selection: String?, paramArrayOfString: Array<String>?): Cursor? {
+        return context.contentResolver.query(
+            MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+            arrayOf("_id", "artist", "number_of_albums", "number_of_tracks"),
+            selection,
+            paramArrayOfString,
+            SortOrder.ArtistSortOrder.ARTIST_A_Z
+        )
+    }
+
+    fun getSongsForArtist(context: Context, artistId: Long): List<Any> {
+        return makeArtistSongCursor(context, artistId)
+            .mapList(true) { Song.fromCursor(this, artistId = artistId) }
+    }
+
+    private fun makeArtistSongCursor(context: Context, artistId: Long): Cursor? {
+        val artistSongSortOrder = MediaStore.Audio.Media.DEFAULT_SORT_ORDER
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val selection = "is_music=1 AND title != '' AND artist_id=$artistId"
+        return context.contentResolver.query(
+            uri,
+            baseProjection,
+            selection,
+            null,
+            artistSongSortOrder
+        )
     }
 }

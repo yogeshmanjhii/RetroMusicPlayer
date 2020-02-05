@@ -27,14 +27,15 @@ import code.name.monkey.retromusic.dialogs.AddToPlaylistDialog
 import code.name.monkey.retromusic.dialogs.DeleteSongsDialog
 import code.name.monkey.retromusic.extensions.ripAlpha
 import code.name.monkey.retromusic.extensions.show
+import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SortOrder.AlbumSongSortOrder
 import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.mvp.presenter.AlbumDetailsPresenter
 import code.name.monkey.retromusic.mvp.presenter.AlbumDetailsView
 import code.name.monkey.retromusic.rest.model.LastFmAlbum
@@ -62,7 +63,6 @@ import kotlinx.android.synthetic.main.activity_album_content.scrobbles
 import kotlinx.android.synthetic.main.activity_album_content.scrobblesLabel
 import kotlinx.android.synthetic.main.activity_album_content.shuffleAction
 import kotlinx.android.synthetic.main.activity_album_content.songTitle
-import java.util.ArrayList
 import javax.inject.Inject
 import android.util.Pair as UtilPair
 
@@ -124,7 +124,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
         albumDetailsPresenter.attachView(this)
 
         if (intent.extras!!.containsKey(EXTRA_ALBUM_ID)) {
-            intent.extras?.getInt(EXTRA_ALBUM_ID)?.let {
+            intent.extras?.getLong(EXTRA_ALBUM_ID)?.let {
                 albumDetailsPresenter.loadAlbum(it)
                 albumCoverContainer?.transitionName = "${getString(R.string.transition_album_art)}_$it"
             }
@@ -151,10 +151,10 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
             NavigationUtil.goToArtistOptions(this, album.artistId, artistPairs)
         }
         playAction.apply {
-            setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
+            //setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
         }
         shuffleAction.apply {
-            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(album.songs!!, true) }
+            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(album.songs!!, true) }
         }
 
         aboutAlbumText.setOnClickListener {
@@ -187,37 +187,32 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     override fun album(album: Album) {
         complete()
-        if (album.songs!!.isEmpty()) {
+        /*if (album.songs!!.isEmpty()) {
             finish()
             return
-        }
+        }*/
         this.album = album
 
         albumTitle.text = album.title
         if (MusicUtil.getYearString(album.year) == "-") {
-            albumText.text = String.format(
-                "%s • %s",
-                album.artistName,
-                MusicUtil.getReadableDurationString(MusicUtil.getTotalDuration(album.songs))
-            )
+            albumText.text = String.format("%s", album.artist)
         } else {
-            albumText.text = String.format(
-                "%s • %s • %s",
-                album.artistName,
-                MusicUtil.getYearString(album.year),
-                MusicUtil.getReadableDurationString(MusicUtil.getTotalDuration(album.songs))
-            )
+            albumText.text = String.format("%s • %s", album.artist, MusicUtil.getYearString(album.year))
         }
         loadAlbumCover()
-        simpleSongAdapter.swapDataSet(album.songs)
+        albumDetailsPresenter.albumSong(album.id)
         albumDetailsPresenter.loadMore(album.artistId)
-        albumDetailsPresenter.aboutAlbum(album.artistName!!, album.title!!)
+        albumDetailsPresenter.aboutAlbum(album.artist, album.title)
+    }
+
+    override fun songs(songs: ArrayList<Song>) {
+        simpleSongAdapter.swapDataSet(songs)
     }
 
     override fun moreAlbums(albums: ArrayList<Album>) {
         moreTitle.show()
         moreRecyclerView.show()
-        moreTitle.text = String.format(getString(R.string.label_more_from), album.artistName)
+        moreTitle.text = String.format(getString(R.string.label_more_from), album.artist)
 
         val albumAdapter = HorizontalAlbumAdapter(this, albums, false, null)
         moreRecyclerView.layoutManager = GridLayoutManager(
@@ -250,19 +245,23 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
     }
 
     override fun loadArtistImage(artist: Artist) {
-        ArtistGlideRequest.Builder.from(Glide.with(this), artist).generatePalette(this).build()
-            .dontAnimate().dontTransform().into(object : RetroMusicColoredTarget(artistImage) {
+        ArtistGlideRequest.Builder.from(Glide.with(this), artist)
+            .generatePalette(this)
+            .build()
+            .dontAnimate()
+            .dontTransform()
+            .into(object : RetroMusicColoredTarget(artistImage) {
                 override fun onColorReady(color: Int) {
                 }
             })
     }
 
     private fun loadAlbumCover() {
-        SongGlideRequest.Builder.from(Glide.with(this), album.safeGetFirstSong())
-            .checkIgnoreMediaStore(this)
-            .ignoreMediaStore(PreferenceUtil.getInstance(this).ignoreMediaStoreArtwork())
+        AlbumGlideRequest.Builder(Glide.with(this), album.id)
             .generatePalette(this)
-            .build().dontAnimate().dontTransform()
+            .build()
+            .dontAnimate()
+            .dontTransform()
             .into(object : RetroMusicColoredTarget(image) {
                 override fun onColorReady(color: Int) {
                     setColors(color)
@@ -383,7 +382,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     private fun reload() {
         if (intent.extras!!.containsKey(EXTRA_ALBUM_ID)) {
-            intent.extras?.getInt(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
+            intent.extras?.getLong(EXTRA_ALBUM_ID)?.let { albumDetailsPresenter.loadAlbum(it) }
         } else {
             finish()
         }

@@ -139,10 +139,10 @@ object TopAndRecentlyPlayedTracksLoader {
         context: Context
     ): ArrayList<Album> {
         arrayListOf<Album>()
-        return AlbumLoader.splitIntoAlbums(getTopTracks(context))
+        return  ArrayList()//AlbumLoader.splitIntoAlbums(getTopTracks(context))
     }
 
     fun getTopArtists(context: Context): ArrayList<Artist> {
-        return ArtistLoader.splitIntoArtists(getTopAlbums(context))
+        return ArrayList()//ArtistLoader.splitIntoArtists(getTopAlbums(context))
     }
 }

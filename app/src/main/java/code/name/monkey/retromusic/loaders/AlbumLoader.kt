@@ -15,13 +15,16 @@
 package code.name.monkey.retromusic.loaders
 
 import android.content.Context
-import android.provider.MediaStore.Audio.AudioColumns
+import android.database.Cursor
+import android.provider.BaseColumns
+import android.provider.MediaStore
+import code.name.monkey.appthemehelper.util.VersionUtils
+import code.name.monkey.retromusic.Constants.baseProjection
+import code.name.monkey.retromusic.extensions.mapList
+import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Song
-import code.name.monkey.retromusic.util.PreferenceUtil
-import java.util.*
-import kotlin.collections.ArrayList
-
+import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as SONGS_URI
 
 /**
  * Created by hemanths on 11/08/17.
@@ -29,75 +32,88 @@ import kotlin.collections.ArrayList
 
 object AlbumLoader {
 
-    fun getAlbums(
-            context: Context,
-            query: String
-    ): ArrayList<Album> {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
-                context,
-                AudioColumns.ALBUM + " LIKE ?",
-                arrayOf("%$query%"),
-                getSongLoaderSortOrder(context))
-        )
-        return splitIntoAlbums(songs)
-    }
-
-    fun getAlbum(
-            context: Context,
-            albumId: Int
-    ): Album {
-        val songs = SongLoader.getSongs(
-                SongLoader.makeSongCursor(
-                        context,
-                        AudioColumns.ALBUM_ID + "=?",
-                        arrayOf(albumId.toString()),
-                        getSongLoaderSortOrder(context)))
-        val album = Album(songs)
-        sortSongsByTrackNumber(album)
-        return album
-    }
-
-    fun getAllAlbums(
-            context: Context
-    ): ArrayList<Album> {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(context, null, null, getSongLoaderSortOrder(context)))
-        return splitIntoAlbums(songs)
-    }
-
-    fun splitIntoAlbums(
-            songs: ArrayList<Song>?
-    ): ArrayList<Album> {
-        val albums = ArrayList<Album>()
-        if (songs != null) {
-            for (song in songs) {
-                getOrCreateAlbum(albums, song.albumId).songs?.add(song)
+    fun getAllAlbums(context: Context): List<Album> {
+        return makeAlbumsCursor(context, null, null)
+            .mapList(true) {
+                Album.fromCursor(this)
             }
+    }
+
+    fun getSongsForAlbum(context: Context, albumId: Long): ArrayList<Song> {
+        return SongLoader.getSongs(makeAlbumSongCursor(context, albumId))
+    }
+
+    fun getAlbum(context: Context, id: Long): Album {
+        return getAlbum(makeAlbumsCursor(context, "_id=?", arrayOf(id.toString())))
+    }
+
+    fun getAlbumsForArtist(context: Context, artistId: Long): List<Album> {
+        return makeAlbumForArtistCursor(context, artistId).mapList(true) {
+            Album.fromCursor(this, artistId)
         }
-        for (album in albums) {
-            sortSongsByTrackNumber(album)
+    }
+
+    private fun makeAlbumForArtistCursor(context: Context, artistId: Long): Cursor? {
+        if (artistId == -1L) {
+            return null
+        }
+        return context.contentResolver.query(
+            MediaStore.Audio.Artists.Albums.getContentUri("external", artistId),
+            arrayOf(
+                if (VersionUtils.hasQ()) MediaStore.Audio.Artists.Albums.ALBUM_ID else BaseColumns._ID,
+                MediaStore.Audio.Artists.Albums.ALBUM,
+                MediaStore.Audio.Artists.Albums.ARTIST,
+                MediaStore.Audio.Artists.Albums.NUMBER_OF_SONGS,
+                MediaStore.Audio.Artists.Albums.FIRST_YEAR
+            ),
+            null,
+            null,
+            MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
+        )
+    }
+
+    private fun getAlbum(cursor: Cursor?): Album {
+        return cursor?.use {
+            if (cursor.moveToFirst()) {
+                Album.fromCursor(cursor)
+            } else {
+                null
+            }
+        } ?: Album()
+    }
+
+    private fun getAlbums(cursor: Cursor?): ArrayList<Album> {
+        val albums = ArrayList<Album>()
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                albums.add(getAlbumFromCursorImpl(cursor))
+            } while (cursor.moveToNext())
         }
         return albums
     }
 
-    private fun getOrCreateAlbum(
-            albums: ArrayList<Album>,
-            albumId: Int
-    ): Album {
-        for (album in albums) {
-            if (album.songs!!.isNotEmpty() && album.songs[0].albumId == albumId) {
-                return album
-            }
-        }
-        val album = Album()
-        albums.add(album)
-        return album
+    private fun getAlbumFromCursorImpl(cursor: Cursor): Album {
+        return Album.fromCursor(cursor)
     }
 
-    private fun sortSongsByTrackNumber(album: Album) {
-        album.songs?.sortWith(Comparator { o1, o2 -> o1.trackNumber.compareTo(o2.trackNumber) })
+    private fun makeAlbumsCursor(context: Context, selection: String?, paramArrayOfString: Array<String>?): Cursor? {
+        return context.contentResolver.query(
+            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+            arrayOf("_id", "album", "artist", "artist_id", "numsongs", "minyear"),
+            selection,
+            paramArrayOfString,
+            SortOrder.AlbumSortOrder.ALBUM_A_Z
+        )
     }
 
-    private fun getSongLoaderSortOrder(context: Context): String {
-        return PreferenceUtil.getInstance(context).albumSortOrder + ", " + PreferenceUtil.getInstance(context).albumSongSortOrder
+    private fun makeAlbumSongCursor(context: Context, albumID: Long): Cursor? {
+        val selection = "is_music=1 AND title != '' AND album_id=$albumID"
+        return context.contentResolver.query(
+            SONGS_URI,
+            baseProjection,
+            selection,
+            null,
+            SortOrder.SongSortOrder.SONG_A_Z
+        )
     }
 }

@@ -22,9 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.util.NavigationUtil
 import code.name.monkey.retromusic.views.MetalRecyclerViewPager
@@ -47,13 +46,13 @@ class AlbumFullWidthAdapter(
         holder.title?.text = getAlbumTitle(album)
         holder.text?.text = getAlbumText(album)
         holder.playSongs?.setOnClickListener {
-            album.songs?.let { songs ->
+            /*album.songs?.let { songs ->
                 MusicPlayerRemote.openQueue(
                     songs,
                     0,
                     true
                 )
-            }
+            }*/
         }
         loadAlbumCover(album, holder)
     }
@@ -63,21 +62,32 @@ class AlbumFullWidthAdapter(
     }
 
     private fun getAlbumText(album: Album): String? {
-        return album.artistName
+        return album.artist
     }
 
     private fun loadAlbumCover(album: Album, holder: FullMetalViewHolder) {
         if (holder.image == null) {
             return
         }
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+
+        AlbumGlideRequest.Builder(Glide.with(activity), album.id)
+            .generatePalette(activity)
+            .build()
+            .dontAnimate()
+            .dontTransform()
+            .into(object : RetroMusicColoredTarget(holder.image!!) {
+                override fun onColorReady(color: Int) {
+
+                }
+            })
+        /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
             .checkIgnoreMediaStore(activity)
             .generatePalette(activity)
             .build()
             .into(object : RetroMusicColoredTarget(holder.image!!) {
                 override fun onColorReady(color: Int) {
                 }
-            })
+            })*/
     }
 
     override fun getItemCount(): Int {

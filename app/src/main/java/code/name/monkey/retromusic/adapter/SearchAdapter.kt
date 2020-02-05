@@ -10,7 +10,6 @@ import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.menu.SongMenuHelper
 import code.name.monkey.retromusic.loaders.PlaylistSongsLoader
@@ -60,9 +59,9 @@ class SearchAdapter(
             ALBUM -> {
                 val album = dataSet?.get(position) as Album
                 holder.title?.text = album.title
-                holder.text?.text = album.artistName
-                SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
-                    .checkIgnoreMediaStore(activity).build().into(holder.image)
+                holder.text?.text = album.artist
+                /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+                    .checkIgnoreMediaStore(activity).build().into(holder.image)*/
             }
             ARTIST -> {
                 val artist = dataSet?.get(position) as Artist

@@ -130,7 +130,7 @@ public class PlaylistsUtil {
     }
 
     static boolean doPlaylistContains(@NonNull final Context context, final long playlistId,
-            final int songId) {
+            final long songId) {
         if (playlistId != -1) {
             try {
                 Cursor c = context.getContentResolver().query(

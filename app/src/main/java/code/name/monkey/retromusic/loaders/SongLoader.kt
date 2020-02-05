@@ -83,7 +83,7 @@ object SongLoader {
     private fun getSongFromCursorImpl(
         cursor: Cursor
     ): Song {
-        val id = cursor.getInt(0)
+        val id = cursor.getLong(0)
         val title = cursor.getString(1)
         val trackNumber = cursor.getInt(2)
         val year = cursor.getInt(3)
@@ -92,7 +92,7 @@ object SongLoader {
         val dateModified = cursor.getLong(6)
         val albumId = cursor.getInt(7)
         val albumName = cursor.getString(8)
-        val artistId = cursor.getInt(9)
+        val artistId = cursor.getLong(9)
         val artistName = cursor.getString(10)
         val composer = cursor.getString(11)
 

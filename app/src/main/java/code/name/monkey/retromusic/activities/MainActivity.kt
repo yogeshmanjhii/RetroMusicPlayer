@@ -19,8 +19,6 @@ import code.name.monkey.retromusic.fragments.mainactivity.home.BannerHomeFragmen
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SearchQueryHelper
 import code.name.monkey.retromusic.interfaces.MainActivityFragmentCallbacks
-import code.name.monkey.retromusic.loaders.AlbumLoader
-import code.name.monkey.retromusic.loaders.ArtistLoader
 import code.name.monkey.retromusic.loaders.PlaylistSongsLoader
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.AppRater
@@ -155,14 +153,14 @@ class MainActivity : AbsSlidingMusicPanelActivity(), SharedPreferences.OnSharedP
             val id = parseIdFromIntent(intent, "albumId", "album").toInt()
             if (id >= 0) {
                 val position = intent.getIntExtra("position", 0)
-                MusicPlayerRemote.openQueue(AlbumLoader.getAlbum(this, id).songs!!, position, true)
+                //MusicPlayerRemote.openQueue(AlbumLoader.getAlbum(this, id).songs!!, position, true)
                 handled = true
             }
         } else if (MediaStore.Audio.Artists.CONTENT_TYPE == mimeType) {
             val id = parseIdFromIntent(intent, "artistId", "artist").toInt()
             if (id >= 0) {
                 val position = intent.getIntExtra("position", 0)
-                MusicPlayerRemote.openQueue(ArtistLoader.getArtist(this, id).songs, position, true)
+                //MusicPlayerRemote.openQueue(ArtistLoader.getArtist(this, id).songs, position, true)
                 handled = true
             }
         }
