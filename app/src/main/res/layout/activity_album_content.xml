@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:text="@string/songs"
-        android:textAppearance="@style/TextViewHeadline5"
+        android:textAppearance="@style/TextViewHeadline6"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
