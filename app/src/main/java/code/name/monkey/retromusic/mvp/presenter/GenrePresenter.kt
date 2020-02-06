@@ -20,8 +20,11 @@ import code.name.monkey.retromusic.mvp.BaseView
 import code.name.monkey.retromusic.mvp.Presenter
 import code.name.monkey.retromusic.mvp.PresenterImpl
 import code.name.monkey.retromusic.providers.interfaces.Repository
-import kotlinx.coroutines.*
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -29,15 +32,17 @@ import kotlin.coroutines.CoroutineContext
  * @author Hemanth S (h4h13).
  */
 interface GenresView : BaseView {
-    fun genres(genres: ArrayList<Genre>)
+
+    fun genres(genres: List<Genre>)
 }
 
 interface GenresPresenter : Presenter<GenresView> {
     fun loadGenres()
 
     class GenresPresenterImpl @Inject constructor(
-            private val repository: Repository
+        private val repository: Repository
     ) : PresenterImpl<GenresView>(), GenresPresenter, CoroutineScope {
+
         private val job = Job()
 
         override val coroutineContext: CoroutineContext

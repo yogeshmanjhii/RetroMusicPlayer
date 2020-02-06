@@ -14,9 +14,7 @@
 
 package code.name.monkey.retromusic.mvp.presenter
 
-import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.Result.Success
-import code.name.monkey.retromusic.loaders.AlbumLoader
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
@@ -39,15 +37,13 @@ interface AlbumDetailsView {
 
     fun album(album: Album)
 
-    fun songs(songs: ArrayList<Song>)
+    fun songs(songs: List<Song>)
 
     fun complete()
 
     fun loadArtistImage(artist: Artist)
 
-    fun moreAlbums(
-        albums: ArrayList<Album>
-    )
+    fun moreAlbums(albums: List<Album>)
 
     fun aboutAlbum(lastFmAlbum: LastFmAlbum)
 }
@@ -55,7 +51,7 @@ interface AlbumDetailsView {
 interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
     fun loadAlbum(albumId: Long)
 
-    fun albumSong(albumId: Long)
+    fun albumSongs(albumId: Long)
 
     fun loadMore(artistId: Long)
 
@@ -88,10 +84,6 @@ interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
 
         private fun showArtistImage(artist: Artist) {
             view?.loadArtistImage(artist)
-
-           /* artist.albums?.filter { it.id != album.id }?.let {
-                if (it.isNotEmpty()) view?.moreAlbums(ArrayList(it))
-            }*/
         }
 
         override fun loadAlbum(albumId: Long) {
@@ -106,11 +98,11 @@ interface AlbumDetailsPresenter : Presenter<AlbumDetailsView> {
             }
         }
 
-        override fun albumSong(albumId: Long) {
+        override fun albumSongs(albumId: Long) {
             launch {
-                val songs = AlbumLoader.getSongsForAlbum(App.getContext(), albumId)
-                withContext(Dispatchers.Main) {
-                    view.songs(songs)
+                when (val result = repository.albumSongsById(albumId)) {
+                    is Success -> withContext(Dispatchers.Main) { view.songs(result.data) }
+                    is Error -> withContext(Dispatchers.Main) {}
                 }
             }
         }

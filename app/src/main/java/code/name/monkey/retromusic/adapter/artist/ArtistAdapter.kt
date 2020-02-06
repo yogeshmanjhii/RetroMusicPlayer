@@ -28,14 +28,14 @@ import java.util.ArrayList
 
 class ArtistAdapter(
     val activity: AppCompatActivity,
-    var dataSet: ArrayList<Artist>,
+    var dataSet: List<Artist>,
     var itemLayoutRes: Int,
     cabHolder: CabHolder?
 ) : AbsMultiSelectAdapter<ArtistAdapter.ViewHolder, Artist>(
     activity, cabHolder, R.menu.menu_media_selection
 ), PopupTextProvider {
 
-    fun swapDataSet(dataSet: ArrayList<Artist>) {
+    fun swapDataSet(dataSet: List<Artist>) {
         this.dataSet = dataSet
         notifyDataSetChanged()
     }

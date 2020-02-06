@@ -34,19 +34,25 @@ interface Repository {
 
     suspend fun albumById(albumId: Long): Result<Album>
 
-    suspend fun allSongs(): Result<ArrayList<Song>>
+    suspend fun albumSongsById(albumId: Long): Result<List<Song>>
 
-    suspend fun allArtists(): Result<ArrayList<Artist>>
+    suspend fun artistSongsById(artistId: Long): Result<List<Song>>
 
-    suspend fun allPlaylists(): Result<ArrayList<Playlist>>
+    suspend fun artistAlbumsById(artistId: Long): Result<List<Album>>
 
-    suspend fun allGenres(): Result<ArrayList<Genre>>
+    suspend fun allSongs(): Result<List<Song>>
+
+    suspend fun allArtists(): Result<List<Artist>>
+
+    suspend fun allPlaylists(): Result<List<Playlist>>
+
+    suspend fun allGenres(): Result<List<Genre>>
 
     suspend fun search(query: String?): Result<MutableList<Any>>
 
-    suspend fun getPlaylistSongs(playlist: Playlist): Result<ArrayList<Song>>
+    suspend fun getPlaylistSongs(playlist: Playlist): Result<List<Song>>
 
-    suspend fun getGenre(genreId: Int): Result<ArrayList<Song>>
+    suspend fun getGenre(genreId: Int): Result<List<Song>>
 
     suspend fun recentArtists(): Result<Home>
 

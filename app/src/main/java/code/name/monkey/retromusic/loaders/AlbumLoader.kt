@@ -31,7 +31,7 @@ import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as SONGS_URI
  * Created by hemanths on 11/08/17.
  */
 
-object AlbumLoader {
+object AlbumLoader  {
 
     fun getAllAlbums(context: Context): List<Album> {
         return makeAlbumCursor(context, null, null)

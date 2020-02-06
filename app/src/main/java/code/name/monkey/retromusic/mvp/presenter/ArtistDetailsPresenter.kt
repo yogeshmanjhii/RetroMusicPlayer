@@ -14,10 +14,7 @@
 
 package code.name.monkey.retromusic.mvp.presenter
 
-import code.name.monkey.retromusic.App
-import code.name.monkey.retromusic.Result
-import code.name.monkey.retromusic.loaders.AlbumLoader
-import code.name.monkey.retromusic.loaders.ArtistLoader
+import code.name.monkey.retromusic.Result.Success
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
@@ -77,12 +74,8 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
         override fun loadBiography(name: String, lang: String?, cache: String?) {
             launch {
                 when (val result = repository.artistInfo(name, lang, cache)) {
-                    is Result.Success -> withContext(Dispatchers.Main) {
-                        view?.artistInfo(result.data)
-                    }
-                    is Result.Error -> withContext(Dispatchers.Main) {
-
-                    }
+                    is Success -> withContext(Dispatchers.Main) { view?.artistInfo(result.data) }
+                    is Error -> withContext(Dispatchers.Main) {}
                 }
             }
         }
@@ -90,31 +83,26 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
         override fun loadArtist(artistId: Long) {
             launch {
                 when (val result = repository.artistById(artistId)) {
-                    is Result.Success -> withContext(Dispatchers.Main) {
-                        view?.artist(result.data)
-
-                    }
-                    is Result.Error -> withContext(Dispatchers.Main) {
-                        view?.showEmptyView()
-                    }
+                    is Success -> withContext(Dispatchers.Main) { view?.artist(result.data) }
+                    is Error -> withContext(Dispatchers.Main) { view?.showEmptyView() }
                 }
             }
         }
 
         override fun loadArtistSongs(artistId: Long) {
             launch {
-                val songs = ArtistLoader.getSongsForArtist(App.getContext(), artistId)
-                withContext(Dispatchers.Main) {
-                    view.songs(songs)
+                when (val result = repository.artistSongsById(artistId)) {
+                    is Success -> withContext(Dispatchers.Main) { view.songs(result.data) }
+                    is Error -> withContext(Dispatchers.Main) {}
                 }
             }
         }
 
         override fun loadArtistAlbums(artistId: Long) {
             launch {
-                val albums = AlbumLoader.getAlbumsForArtist(App.getContext(), artistId)
-                withContext(Dispatchers.Main) {
-                    view.albums(albums)
+                when (val result = repository.artistAlbumsById(artistId)) {
+                    is Success -> withContext(Dispatchers.Main) { view.albums(result.data) }
+                    is Error -> withContext(Dispatchers.Main) {}
                 }
             }
         }

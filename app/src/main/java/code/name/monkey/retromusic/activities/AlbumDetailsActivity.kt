@@ -88,7 +88,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     private lateinit var simpleSongAdapter: SimpleSongAdapter
     private lateinit var album: Album
-    private lateinit var songs: ArrayList<Song>
+    private lateinit var songs: List<Song>
     private var cab: MaterialCab? = null
 
     private val savedSortOrder: String
@@ -193,17 +193,17 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
             albumText.text = String.format("%s • %s", album.artist, MusicUtil.getYearString(album.year))
         }
         loadAlbumCover()
-        albumDetailsPresenter.albumSong(album.id)
+        albumDetailsPresenter.albumSongs(album.id)
         albumDetailsPresenter.loadMore(album.artistId)
         albumDetailsPresenter.aboutAlbum(album.artist, album.title)
     }
 
-    override fun songs(songs: ArrayList<Song>) {
+    override fun songs(songs: List<Song>) {
         this.songs = songs
         simpleSongAdapter.swapDataSet(songs)
     }
 
-    override fun moreAlbums(albums: ArrayList<Album>) {
+    override fun moreAlbums(albums: List<Album>) {
         moreTitle.show()
         moreRecyclerView.show()
         moreTitle.text = String.format(getString(R.string.label_more_from), album.artist)

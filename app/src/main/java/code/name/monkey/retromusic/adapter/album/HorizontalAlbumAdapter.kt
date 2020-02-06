@@ -11,11 +11,10 @@ import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.util.MusicUtil
 import com.bumptech.glide.Glide
-import java.util.ArrayList
 
 class HorizontalAlbumAdapter(
     activity: AppCompatActivity,
-    dataSet: ArrayList<Album>,
+    dataSet: List<Album>,
     cabHolder: CabHolder?
 ) : AlbumAdapter(
     activity, dataSet, HorizontalAdapterHelper.LAYOUT_RES, cabHolder

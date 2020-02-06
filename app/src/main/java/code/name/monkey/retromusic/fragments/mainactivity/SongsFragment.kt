@@ -49,7 +49,7 @@ class SongsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdap
         )
     }
 
-    override fun songs(songs: ArrayList<Song>) {
+    override fun songs(songs: List<Song>) {
         adapter?.swapDataSet(songs)
     }
 

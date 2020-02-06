@@ -67,6 +67,33 @@ class RepositoryImpl @Inject constructor(private val context: Context) : Reposit
         }
     }
 
+    override suspend fun albumSongsById(albumId: Long): Result<List<Song>> {
+        return try {
+            val songs = AlbumLoader.getSongsForAlbum(context, albumId)
+            Success(songs)
+        } catch (e: Exception) {
+            Error(e)
+        }
+    }
+
+    override suspend fun artistSongsById(artistId: Long): Result<List<Song>> {
+        return try {
+            val songs = ArtistLoader.getSongsForArtist(context, artistId)
+            Success(songs)
+        } catch (e: Exception) {
+            Error(e)
+        }
+    }
+
+    override suspend fun artistAlbumsById(artistId: Long): Result<List<Album>> {
+        return try {
+            val albums = AlbumLoader.getAlbumsForArtist(context, artistId)
+            Success(albums)
+        } catch (e: Exception) {
+            Error(e)
+        }
+    }
+
     override suspend fun allArtists(): Result<ArrayList<Artist>> {
         return try {
             val artists = ArtistLoader.getAllArtists(context)

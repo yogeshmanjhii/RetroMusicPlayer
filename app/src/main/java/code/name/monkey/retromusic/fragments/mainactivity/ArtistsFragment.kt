@@ -16,7 +16,7 @@ import javax.inject.Inject
 class ArtistsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<ArtistAdapter, GridLayoutManager>(),
     ArtistsView {
 
-    override fun artists(artists: ArrayList<Artist>) {
+    override fun artists(artists: List<Artist>) {
         adapter?.swapDataSet(artists)
     }
 

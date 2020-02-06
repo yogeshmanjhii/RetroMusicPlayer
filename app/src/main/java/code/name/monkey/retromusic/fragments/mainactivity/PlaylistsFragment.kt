@@ -63,7 +63,7 @@ class PlaylistsFragment : AbsLibraryPagerRecyclerViewFragment<PlaylistAdapter, L
         adapter?.swapDataSet(ArrayList())
     }
 
-    override fun playlists(playlists: ArrayList<Playlist>) {
+    override fun playlists(playlists: List<Playlist>) {
         adapter?.swapDataSet(playlists)
     }
 
