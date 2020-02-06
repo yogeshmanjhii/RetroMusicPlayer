@@ -40,7 +40,7 @@ class SongsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdap
     }
 
     override fun createAdapter(): SongAdapter {
-        val dataSet = if (adapter == null) ArrayList() else adapter!!.dataSet
+        val dataSet = if (adapter == null) mutableListOf() else adapter!!.dataSet
         return ShuffleButtonSongAdapter(
             libraryFragment.mainActivity,
             dataSet,

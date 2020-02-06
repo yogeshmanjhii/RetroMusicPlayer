@@ -59,7 +59,7 @@ public class NavigationUtil {
         ActivityCompat.startActivity(activity, new Intent(activity, AboutActivity.class), null);
     }
 
-    public static void goToAlbum(@NonNull Activity activity, int albumId) {
+    public static void goToAlbum(@NonNull Activity activity, long albumId) {
         Intent intent = new Intent(activity, AlbumDetailsActivity.class);
         intent.putExtra(AlbumDetailsActivity.EXTRA_ALBUM_ID, albumId);
         ActivityCompat.startActivity(activity, intent, null);

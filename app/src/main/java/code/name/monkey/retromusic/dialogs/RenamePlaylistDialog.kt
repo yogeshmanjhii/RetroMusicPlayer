@@ -23,7 +23,6 @@ import code.name.monkey.appthemehelper.util.MaterialUtil
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.R.layout
 import code.name.monkey.retromusic.R.string
-import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.util.PlaylistsUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.afollestad.materialdialogs.LayoutMode
@@ -60,7 +59,7 @@ class RenamePlaylistDialog : DialogFragment() {
         MaterialUtil.setTint(actionNewPlaylistContainer, false)
 
         val playlistId = arguments!!.getLong(PLAYLIST_ID)
-        playlistView.appHandleColor()
+        playlistView
             .setText(PlaylistsUtil.getNameForPlaylist(context!!, playlistId), TextView.BufferType.EDITABLE)
         return materialDialog
     }

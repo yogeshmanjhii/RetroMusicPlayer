@@ -21,6 +21,7 @@ class SortOrder {
      * Artist sort order entries.
      */
     interface ArtistSortOrder {
+
         companion object {
 
             /* Artist sort order A-Z */
@@ -41,6 +42,7 @@ class SortOrder {
      * Album sort order entries.
      */
     interface AlbumSortOrder {
+
         companion object {
 
             /* Album sort order A-Z */
@@ -57,7 +59,7 @@ class SortOrder {
                     + ", " + MediaStore.Audio.Albums.DEFAULT_SORT_ORDER)
 
             /* Album sort order year */
-            const val ALBUM_YEAR = MediaStore.Audio.Media.YEAR + " DESC"
+            const val ALBUM_YEAR = MediaStore.Audio.Albums.FIRST_YEAR + " DESC"
         }
     }
 
@@ -65,6 +67,7 @@ class SortOrder {
      * Song sort order entries.
      */
     interface SongSortOrder {
+
         companion object {
 
             /* Song sort order A-Z */
@@ -97,6 +100,7 @@ class SortOrder {
      * Album song sort order entries.
      */
     interface AlbumSongSortOrder {
+
         companion object {
 
             /* Album song sort order A-Z */
@@ -118,6 +122,7 @@ class SortOrder {
      * Artist song sort order entries.
      */
     interface ArtistSongSortOrder {
+
         companion object {
 
             /* Artist song sort order A-Z */
@@ -144,6 +149,7 @@ class SortOrder {
      * Artist album sort order entries.
      */
     interface ArtistAlbumSortOrder {
+
         companion object {
 
             /* Artist album sort order A-Z */
@@ -164,6 +170,7 @@ class SortOrder {
      * Genre sort order entries.
      */
     interface GenreSortOrder {
+
         companion object {
 
             /* Genre sort order A-Z */
@@ -173,5 +180,4 @@ class SortOrder {
             const val ALBUM_Z_A = "$GENRE_A_Z DESC"
         }
     }
-
 }

@@ -15,10 +15,10 @@ import android.widget.Toast
 import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.appthemehelper.util.MaterialUtil
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.extensions.applyToolbar
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteTranscoder
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteWrapper
+import code.name.monkey.retromusic.loaders.AlbumLoader
 import code.name.monkey.retromusic.rest.LastFMRestClient
 import code.name.monkey.retromusic.util.ImageUtil
 import code.name.monkey.retromusic.util.RetroColorUtil.generatePalette
@@ -31,6 +31,8 @@ import kotlinx.android.synthetic.main.activity_album_tag_editor.albumArtistConta
 import kotlinx.android.synthetic.main.activity_album_tag_editor.albumArtistText
 import kotlinx.android.synthetic.main.activity_album_tag_editor.albumText
 import kotlinx.android.synthetic.main.activity_album_tag_editor.albumTitleContainer
+import kotlinx.android.synthetic.main.activity_album_tag_editor.artistContainer
+import kotlinx.android.synthetic.main.activity_album_tag_editor.artistText
 import kotlinx.android.synthetic.main.activity_album_tag_editor.genreContainer
 import kotlinx.android.synthetic.main.activity_album_tag_editor.genreTitle
 import kotlinx.android.synthetic.main.activity_album_tag_editor.imageContainer
@@ -56,7 +58,9 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
 
     override fun loadImageFromFile(selectedFileUri: Uri?) {
 
-        Glide.with(this@AlbumTagEditorActivity).load(selectedFileUri).asBitmap()
+        Glide.with(this@AlbumTagEditorActivity)
+            .load(selectedFileUri)
+            .asBitmap()
             .transcode(BitmapPaletteTranscoder(this), BitmapPaletteWrapper::class.java)
             .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
             .into(object : SimpleTarget<BitmapPaletteWrapper>() {
@@ -113,15 +117,18 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
         MaterialUtil.setTint(genreContainer, false)
         MaterialUtil.setTint(albumTitleContainer, false)
         MaterialUtil.setTint(albumArtistContainer, false)
+        MaterialUtil.setTint(artistContainer, false)
 
-        albumText.appHandleColor().addTextChangedListener(this)
-        albumArtistText.appHandleColor().addTextChangedListener(this)
-        genreTitle.appHandleColor().addTextChangedListener(this)
-        yearTitle.appHandleColor().addTextChangedListener(this)
+        albumText.addTextChangedListener(this)
+        artistText.addTextChangedListener(this)
+        albumArtistText.addTextChangedListener(this)
+        genreTitle.addTextChangedListener(this)
+        yearTitle.addTextChangedListener(this)
     }
 
     private fun fillViewsWithFileTags() {
         albumText.setText(albumTitle)
+        artistText.setText(artistName)
         albumArtistText.setText(albumArtistName)
         genreTitle.setText(genreName)
         yearTitle.setText(songYear)
@@ -137,10 +144,6 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
             )
         )
         deleteAlbumArt = false
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     private fun toastLoadingFailed() {
@@ -168,26 +171,28 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
         val fieldKeyValueMap = EnumMap<FieldKey, String>(FieldKey::class.java)
         fieldKeyValueMap[FieldKey.ALBUM] = albumText.text.toString()
         //android seems not to recognize album_artist field so we additionally write the normal artist field
-        fieldKeyValueMap[FieldKey.ARTIST] = albumArtistText.text.toString()
+        fieldKeyValueMap[FieldKey.ARTIST] = artistText.text.toString()
         fieldKeyValueMap[FieldKey.ALBUM_ARTIST] = albumArtistText.text.toString()
         fieldKeyValueMap[FieldKey.GENRE] = genreTitle.text.toString()
         fieldKeyValueMap[FieldKey.YEAR] = yearTitle.text.toString()
 
         writeValuesToFiles(
             fieldKeyValueMap,
-            if (deleteAlbumArt) ArtworkInfo(id, null)
-            else if (albumArtBitmap == null) null else ArtworkInfo(id, albumArtBitmap!!)
+            when {
+                deleteAlbumArt -> ArtworkInfo(id, null)
+                albumArtBitmap == null -> null
+                else -> ArtworkInfo(id, albumArtBitmap!!)
+            }
         )
     }
 
     override fun getSongPaths(): List<String> {
-        //val songs = AlbumLoader.getAlbum(this, id).songs
-        //val paths = ArrayList<String>(songs!!.size)
-        //for (song in songs) {
-          //  paths.add(song.data)
-        //}
-        //return paths
-        return emptyList()
+        val songs = AlbumLoader.getSongsForAlbum(this, id)
+        val paths = ArrayList<String>(songs.size)
+        for (song in songs) {
+            paths.add(song.data)
+        }
+        return paths
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -206,7 +211,6 @@ class AlbumTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
     }
 
     companion object {
-
         val TAG: String = AlbumTagEditorActivity::class.java.simpleName
     }
 }

@@ -15,13 +15,12 @@
 package code.name.monkey.retromusic.model
 
 import android.database.Cursor
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.ALBUM
 import android.provider.MediaStore.Audio.Albums.ARTIST
 import android.provider.MediaStore.Audio.Albums.FIRST_YEAR
 import android.provider.MediaStore.Audio.Albums.NUMBER_OF_SONGS
-import android.provider.MediaStore.Audio.Albums._ID
-import android.provider.MediaStore.Audio.Artists.Albums.ALBUM_ID
-import code.name.monkey.appthemehelper.util.VersionUtils
+import code.name.monkey.retromusic.loaders.getAlbumId
 
 data class Album(
     var id: Long = 0,
@@ -35,13 +34,17 @@ data class Album(
     companion object {
         fun fromCursor(cursor: Cursor, artistId: Long = -1): Album {
             return Album(
-                id = cursor.value(if (VersionUtils.hasQ()) ALBUM_ID else _ID),
+                id = cursor.value(getAlbumId()),
                 title = cursor.valueOrEmpty(ALBUM),
                 artist = cursor.valueOrEmpty(ARTIST),
-                artistId = artistId,
+                artistId = if (artistId == -1L) cursor.value(MediaStore.Audio.AudioColumns.ARTIST_ID) else artistId,
                 songCount = cursor.value(NUMBER_OF_SONGS),
                 year = cursor.value(FIRST_YEAR)
             )
+        }
+
+        fun fromSong(song: Song): Album {
+            return Album(song.albumId, song.albumName, song.artistName, song.artistId, -1, song.year)
         }
     }
 }

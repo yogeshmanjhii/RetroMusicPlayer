@@ -6,7 +6,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import code.name.monkey.appthemehelper.util.MaterialUtil
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.extensions.applyToolbar
 import code.name.monkey.retromusic.loaders.SongLoader
 import kotlinx.android.synthetic.main.activity_song_tag_editor.albumArtistContainer
@@ -43,7 +42,6 @@ class SongTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
         setNoImageMode()
         setUpViews()
         applyToolbar(toolbar)
-
     }
 
     private fun setUpViews() {
@@ -58,15 +56,15 @@ class SongTagEditorActivity : AbsTagEditorActivity(), TextWatcher {
         MaterialUtil.setTint(trackNumberContainer, false)
         MaterialUtil.setTint(lyricsContainer, false)
 
-        songText.appHandleColor().addTextChangedListener(this)
-        albumText.appHandleColor().addTextChangedListener(this)
-        albumArtistText.appHandleColor().addTextChangedListener(this)
-        artistText.appHandleColor().addTextChangedListener(this)
-        genreText.appHandleColor().addTextChangedListener(this)
-        yearText.appHandleColor().addTextChangedListener(this)
-        trackNumberText.appHandleColor().addTextChangedListener(this)
-        lyricsText.appHandleColor().addTextChangedListener(this)
-        songComposerText.appHandleColor().addTextChangedListener(this)
+        songText.addTextChangedListener(this)
+        albumText.addTextChangedListener(this)
+        albumArtistText.addTextChangedListener(this)
+        artistText.addTextChangedListener(this)
+        genreText.addTextChangedListener(this)
+        yearText.addTextChangedListener(this)
+        trackNumberText.addTextChangedListener(this)
+        lyricsText.addTextChangedListener(this)
+        songComposerText.addTextChangedListener(this)
     }
 
     private fun fillViewsWithFileTags() {

@@ -75,32 +75,14 @@ object SongLoader {
     }
 
     @JvmStatic
-    fun getSong(context: Context, queryId: Int): Song {
+    fun getSong(context: Context, queryId: Long): Song {
         val cursor = makeSongCursor(context, AudioColumns._ID + "=?", arrayOf(queryId.toString()))
         return getSong(cursor)
     }
 
     private fun getSongFromCursorImpl(
         cursor: Cursor
-    ): Song {
-        val id = cursor.getLong(0)
-        val title = cursor.getString(1)
-        val trackNumber = cursor.getInt(2)
-        val year = cursor.getInt(3)
-        val duration = cursor.getLong(4)
-        val data = cursor.getString(5)
-        val dateModified = cursor.getLong(6)
-        val albumId = cursor.getInt(7)
-        val albumName = cursor.getString(8)
-        val artistId = cursor.getLong(9)
-        val artistName = cursor.getString(10)
-        val composer = cursor.getString(11)
-
-        return Song(
-            id, title, trackNumber, year, duration, data, dateModified, albumId,
-            albumName ?: "", artistId, artistName, composer ?: ""
-        )
-    }
+    ): Song = Song.fromCursor(cursor)
 
     @JvmOverloads
     fun makeSongCursor(

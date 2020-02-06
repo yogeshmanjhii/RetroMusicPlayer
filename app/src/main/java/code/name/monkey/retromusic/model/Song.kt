@@ -27,7 +27,7 @@ open class Song(
     val duration: Long,
     val data: String,
     val dateModified: Long,
-    val albumId: Int,
+    val albumId: Long,
     val albumName: String,
     val artistId: Long,
     val artistName: String,
@@ -52,16 +52,16 @@ open class Song(
             ""
         )
 
-        fun fromCursor(cursor: Cursor, artistId: Long): Any {
+        fun fromCursor(cursor: Cursor, albumId: Long = -1, artistId: Long = -1): Song {
             return Song(
                 id = cursor.value(Media._ID),
-                albumId = cursor.value(Media.ALBUM_ID),
-                artistId = cursor.value(Media.ARTIST_ID),
+                albumId = cursor.valueOrDefault(Media.ALBUM_ID, albumId),
+                artistId = cursor.valueOrDefault(Media.ARTIST_ID, artistId),
                 albumName = cursor.valueOrEmpty(Media.ALBUM),
                 artistName = cursor.valueOrEmpty(Media.ARTIST),
                 composer = cursor.valueOrEmpty(Media.COMPOSER),
                 data = cursor.valueOrEmpty(Media.DATA),
-                dateModified = cursor.value(Media.DATE_ADDED),
+                dateModified = cursor.value(Media.DATE_MODIFIED),
                 duration = cursor.value(Media.DURATION),
                 title = cursor.valueOrEmpty(Media.TITLE),
                 trackNumber = cursor.value(Media.TRACK),

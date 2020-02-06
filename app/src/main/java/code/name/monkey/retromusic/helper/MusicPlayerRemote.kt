@@ -29,7 +29,6 @@ import android.os.Environment
 import android.os.IBinder
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import code.name.monkey.retromusic.loaders.SongLoader
@@ -158,7 +157,7 @@ object MusicPlayerRemote {
                 return cursor.getString(columnIndex)
             }
         } catch (e: Exception) {
-            Log.e(TAG, e.message)
+            println(e.message)
         } finally {
             cursor?.close()
         }
@@ -222,7 +221,7 @@ object MusicPlayerRemote {
     /**
      * Async
      */
-    fun openQueue(queue: ArrayList<Song>, startPosition: Int, startPlaying: Boolean) {
+    fun openQueue(queue: List<Song>, startPosition: Int, startPlaying: Boolean) {
         if (!tryToHandleOpenPlayingQueue(queue, startPosition, startPlaying) && musicService != null) {
             musicService!!.openQueue(queue, startPosition, startPlaying)
             if (PreferenceUtil.getInstance(musicService).isShuffleModeOn)
@@ -233,7 +232,7 @@ object MusicPlayerRemote {
     /**
      * Async
      */
-    fun openAndShuffleQueue(queue: ArrayList<Song>, startPlaying: Boolean) {
+    fun openAndShuffleQueue(queue: List<Song>, startPlaying: Boolean) {
         var startPosition = 0
         if (queue.isNotEmpty()) {
             startPosition = Random().nextInt(queue.size)
@@ -246,7 +245,7 @@ object MusicPlayerRemote {
     }
 
     private fun tryToHandleOpenPlayingQueue(
-        queue: ArrayList<Song>,
+        queue: List<Song>,
         startPosition: Int,
         startPlaying: Boolean
     ): Boolean {
@@ -316,7 +315,7 @@ object MusicPlayerRemote {
         return false
     }
 
-    fun playNext(songs: ArrayList<Song>): Boolean {
+    fun playNext(songs: List<Song>): Boolean {
         if (musicService != null) {
             if (playingQueue.size > 0) {
                 musicService!!.addSongs(position + 1, songs)
@@ -353,7 +352,7 @@ object MusicPlayerRemote {
         return false
     }
 
-    fun enqueue(songs: ArrayList<Song>): Boolean {
+    fun enqueue(songs: List<Song>): Boolean {
         if (musicService != null) {
             if (playingQueue.size > 0) {
                 musicService!!.addSongs(songs)

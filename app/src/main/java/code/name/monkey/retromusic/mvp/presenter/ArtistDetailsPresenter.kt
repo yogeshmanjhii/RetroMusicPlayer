@@ -17,6 +17,7 @@ package code.name.monkey.retromusic.mvp.presenter
 import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.Result
 import code.name.monkey.retromusic.loaders.AlbumLoader
+import code.name.monkey.retromusic.loaders.ArtistLoader
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
@@ -39,7 +40,7 @@ import kotlin.coroutines.CoroutineContext
  */
 interface ArtistDetailsView : BaseView {
 
-    fun songs(songs: ArrayList<Song>)
+    fun songs(songs: List<Song>)
 
     fun albums(albums: List<Album>)
 
@@ -102,7 +103,7 @@ interface ArtistDetailsPresenter : Presenter<ArtistDetailsView> {
 
         override fun loadArtistSongs(artistId: Long) {
             launch {
-                val songs = AlbumLoader.getSongsForAlbum(App.getContext(), artistId)
+                val songs = ArtistLoader.getSongsForArtist(App.getContext(), artistId)
                 withContext(Dispatchers.Main) {
                     view.songs(songs)
                 }

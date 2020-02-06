@@ -99,7 +99,7 @@ public class MusicUtil {
         }
     }
 
-    public static void deleteAlbumArt(@NonNull Context context, int albumId) {
+    public static void deleteAlbumArt(@NonNull Context context, long albumId) {
         ContentResolver contentResolver = context.getContentResolver();
         Uri localUri = Uri.parse("content://media/external/audio/albumart");
         contentResolver.delete(ContentUris.withAppendedId(localUri, albumId), null, null);
@@ -348,7 +348,7 @@ public class MusicUtil {
         return -1;
     }
 
-    public static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
+    public static void insertAlbumArt(@NonNull Context context, long albumId, String path) {
         ContentResolver contentResolver = context.getContentResolver();
 
         Uri artworkUri = Uri.parse("content://media/external/audio/albumart");

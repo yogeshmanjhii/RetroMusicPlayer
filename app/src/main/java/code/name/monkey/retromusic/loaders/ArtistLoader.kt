@@ -19,64 +19,12 @@ import android.database.Cursor
 import android.provider.MediaStore
 import code.name.monkey.retromusic.Constants.baseProjection
 import code.name.monkey.retromusic.extensions.mapList
-import code.name.monkey.retromusic.helper.SortOrder
+import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.util.PreferenceUtil
 
 object ArtistLoader {
-    /*private fun getSongLoaderSortOrder(context: Context): String {
-        return PreferenceUtil.getInstance(context).artistSortOrder + ", " + PreferenceUtil.getInstance(context).artistAlbumSortOrder + ", " + PreferenceUtil.getInstance(context).albumSongSortOrder
-    }
-
-    fun getAllArtists(context: Context): ArrayList<Artist> {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
-                context,
-                null, null,
-                getSongLoaderSortOrder(context))
-        )
-        return splitIntoArtists(null)
-    }
-
-    fun getArtists(context: Context, query: String): ArrayList<Artist> {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
-                context,
-                AudioColumns.ARTIST + " LIKE ?",
-                arrayOf("%$query%"),
-                getSongLoaderSortOrder(context))
-        )
-        return splitIntoArtists(null)
-    }
-
-    fun splitIntoArtists(albums: ArrayList<Album>?): ArrayList<Artist> {
-        val artists = ArrayList<Artist>()
-        if (albums != null) {
-            for (album in albums) {
-                getOrCreateArtist(artists, album.artistId).albums!!.add(album)
-            }
-        }
-        return artists
-    }
-
-    private fun getOrCreateArtist(artists: ArrayList<Artist>, artistId: Int): Artist {
-        for (artist in artists) {
-            *//*if (artist.albums!!.isNotEmpty() && artist.albums[0].songs!!.isNotEmpty() && artist.albums[0].songs!![0].artistId == artistId) {
-                return artist
-            }*//*
-        }
-        val album = Artist()
-        artists.add(album)
-        return album
-    }
-
-    fun getArtist(context: Context, artistId: Int): Artist {
-        val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
-                context,
-                AudioColumns.ARTIST_ID + "=?",
-                arrayOf(artistId.toString()),
-                getSongLoaderSortOrder(context))
-        )
-        return Artist(ArrayList())
-    }*/
 
     fun getAllArtists(context: Context): ArrayList<Artist> {
         return getArtists(makeArtistCursor(context, null, null))
@@ -113,14 +61,19 @@ object ArtistLoader {
     private fun makeArtistCursor(context: Context, selection: String?, paramArrayOfString: Array<String>?): Cursor? {
         return context.contentResolver.query(
             MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-            arrayOf("_id", "artist", "number_of_albums", "number_of_tracks"),
+            arrayOf(
+                "_id",
+                "artist",
+                "number_of_albums",
+                "number_of_tracks"
+            ),
             selection,
             paramArrayOfString,
-            SortOrder.ArtistSortOrder.ARTIST_A_Z
+            PreferenceUtil.getInstance(context).artistSortOrder
         )
     }
 
-    fun getSongsForArtist(context: Context, artistId: Long): List<Any> {
+    fun getSongsForArtist(context: Context, artistId: Long): List<Song> {
         return makeArtistSongCursor(context, artistId)
             .mapList(true) { Song.fromCursor(this, artistId = artistId) }
     }
@@ -136,5 +89,26 @@ object ArtistLoader {
             null,
             artistSongSortOrder
         )
+    }
+
+    fun splitIntoArtists(albums: ArrayList<Album>): ArrayList<Artist> {
+        val artists = ArrayList<Artist>()
+        if (albums.isNotEmpty()) {
+            for (album in albums) {
+                getOrCreateArtist(artists, album)
+            }
+        }
+        return artists
+    }
+
+    private fun getOrCreateArtist(artists: ArrayList<Artist>, album: Album): Artist {
+        for (artist in artists) {
+            if (artist.id == album.artistId) {
+                return artist
+            }
+        }
+        val a = Artist.fromAlbum(album)
+        artists.add(a)
+        return a
     }
 }

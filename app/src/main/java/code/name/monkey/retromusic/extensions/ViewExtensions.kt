@@ -17,11 +17,7 @@ package code.name.monkey.retromusic.extensions
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.annotation.LayoutRes
-import code.name.monkey.appthemehelper.ThemeStore
-import code.name.monkey.appthemehelper.util.TintHelper
-
 
 @Suppress("UNCHECKED_CAST")
 fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int): T {
@@ -41,8 +37,3 @@ fun View.hidden() {
 }
 
 fun View.showOrHide(show: Boolean) = if (show) show() else hide()
-
-fun EditText.appHandleColor(): EditText {
-    TintHelper.colorHandles(this, ThemeStore.accentColor(context))
-    return this
-}

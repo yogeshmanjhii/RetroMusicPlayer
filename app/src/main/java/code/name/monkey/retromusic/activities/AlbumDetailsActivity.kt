@@ -8,7 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.SubMenu
 import android.view.View
-import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -49,6 +48,7 @@ import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_album.albumCoverContainer
 import kotlinx.android.synthetic.main.activity_album.albumText
 import kotlinx.android.synthetic.main.activity_album.albumTitle
+import kotlinx.android.synthetic.main.activity_album.artistImage
 import kotlinx.android.synthetic.main.activity_album.image
 import kotlinx.android.synthetic.main.activity_album.toolbar
 import kotlinx.android.synthetic.main.activity_album_content.aboutAlbumText
@@ -88,8 +88,9 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     private lateinit var simpleSongAdapter: SimpleSongAdapter
     private lateinit var album: Album
-    private lateinit var artistImage: ImageView
+    private lateinit var songs: ArrayList<Song>
     private var cab: MaterialCab? = null
+
     private val savedSortOrder: String
         get() = PreferenceUtil.getInstance(this).albumDetailSongSortOrder
 
@@ -106,7 +107,6 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
         slide.excludeTarget(R.id.status_bar, true)
         slide.excludeTarget(android.R.id.statusBarBackground, true)
         slide.excludeTarget(android.R.id.navigationBarBackground, true)
-
         window.enterTransition = slide
     }
 
@@ -135,12 +135,10 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
         windowEnterTransition()
         ActivityCompat.postponeEnterTransition(this)
 
-
-        artistImage = findViewById(R.id.artistImage)
-
         setupRecyclerView()
 
         artistImage.setOnClickListener {
+            println("Click Artist $album")
             val artistPairs = ActivityOptions.makeSceneTransitionAnimation(
                 this,
                 UtilPair.create(
@@ -151,10 +149,10 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
             NavigationUtil.goToArtistOptions(this, album.artistId, artistPairs)
         }
         playAction.apply {
-            //setOnClickListener { MusicPlayerRemote.openQueue(album.songs!!, 0, true) }
+            setOnClickListener { MusicPlayerRemote.openQueue(songs, 0, true) }
         }
         shuffleAction.apply {
-            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(album.songs!!, true) }
+            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(songs, true) }
         }
 
         aboutAlbumText.setOnClickListener {
@@ -187,12 +185,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     override fun album(album: Album) {
         complete()
-        /*if (album.songs!!.isEmpty()) {
-            finish()
-            return
-        }*/
         this.album = album
-
         albumTitle.text = album.title
         if (MusicUtil.getYearString(album.year) == "-") {
             albumText.text = String.format("%s", album.artist)
@@ -206,6 +199,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
     }
 
     override fun songs(songs: ArrayList<Song>) {
+        this.songs = songs
         simpleSongAdapter.swapDataSet(songs)
     }
 
@@ -361,16 +355,18 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
 
     private fun setUpSortOrderMenu(sortOrder: SubMenu) {
         when (savedSortOrder) {
-            AlbumSongSortOrder.SONG_A_Z -> sortOrder.findItem(R.id.action_sort_order_title).isChecked = true
-            AlbumSongSortOrder.SONG_Z_A -> sortOrder.findItem(R.id.action_sort_order_title_desc).isChecked = true
-            AlbumSongSortOrder.SONG_TRACK_LIST -> sortOrder.findItem(R.id.action_sort_order_track_list).isChecked =
-                true
-            AlbumSongSortOrder.SONG_DURATION -> sortOrder.findItem(R.id.action_sort_order_artist_song_duration)
-                .isChecked = true
+            AlbumSongSortOrder.SONG_A_Z ->
+                sortOrder.findItem(R.id.action_sort_order_title).isChecked = true
+            AlbumSongSortOrder.SONG_Z_A ->
+                sortOrder.findItem(R.id.action_sort_order_title_desc).isChecked = true
+            AlbumSongSortOrder.SONG_TRACK_LIST ->
+                sortOrder.findItem(R.id.action_sort_order_track_list).isChecked = true
+            AlbumSongSortOrder.SONG_DURATION ->
+                sortOrder.findItem(R.id.action_sort_order_artist_song_duration).isChecked = true
         }
     }
 
-    private fun setSaveSortOrder(sortOrder: String?) {
+    private fun setSaveSortOrder(sortOrder: String) {
         PreferenceUtil.getInstance(this).albumDetailSongSortOrder = sortOrder
         reload()
     }

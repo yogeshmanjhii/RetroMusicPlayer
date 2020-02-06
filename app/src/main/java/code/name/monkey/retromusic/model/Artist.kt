@@ -84,6 +84,10 @@ class Artist(
             )
         }
 
+        fun fromAlbum(album: Album): Artist {
+            return Artist(album.artistId, album.artist, -1, -1)
+        }
+
         const val UNKNOWN_ARTIST_DISPLAY_NAME = "Unknown Artist"
     }
 }

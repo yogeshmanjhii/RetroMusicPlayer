@@ -189,7 +189,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         ActivityCompat.startPostponedEnterTransition(this)
     }
 
-    override fun songs(songs: ArrayList<Song>) {
+    override fun songs(songs: List<Song>) {
         songAdapter.swapDataSet(songs)
     }
 
@@ -215,7 +215,6 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         )
         artistDetailsPresenter.loadArtistAlbums(artist.id)
         artistDetailsPresenter.loadArtistSongs(artist.id)
-        //albumAdapter.swapDataSet(artist.albums!!)
     }
 
     private fun loadBiography(

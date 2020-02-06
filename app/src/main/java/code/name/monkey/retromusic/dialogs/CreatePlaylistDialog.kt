@@ -23,7 +23,6 @@ import code.name.monkey.appthemehelper.util.MaterialUtil
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.R.layout
 import code.name.monkey.retromusic.R.string
-import code.name.monkey.retromusic.extensions.appHandleColor
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PlaylistsUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
@@ -35,36 +34,35 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-
 class CreatePlaylistDialog : DialogFragment() {
 
     private lateinit var playlistView: TextInputEditText
     private lateinit var actionNewPlaylistContainer: TextInputLayout
 
     override fun onCreateDialog(
-            savedInstanceState: Bundle?
+        savedInstanceState: Bundle?
     ): Dialog {
         val materialDialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT))
-                .show {
-                    cornerRadius(PreferenceUtil.getInstance(requireContext()).dialogCorner)
-                    title(string.new_playlist_title)
-                    customView(layout.dialog_playlist)
-                    negativeButton(android.R.string.cancel)
-                    positiveButton(string.create_action) {
-                        if (activity == null) {
-                            return@positiveButton
-                        }
-                        val songs = arguments?.getParcelableArrayList<Song>("songs")
-                                ?: return@positiveButton
+            .show {
+                cornerRadius(PreferenceUtil.getInstance(requireContext()).dialogCorner)
+                title(string.new_playlist_title)
+                customView(layout.dialog_playlist)
+                negativeButton(android.R.string.cancel)
+                positiveButton(string.create_action) {
+                    if (activity == null) {
+                        return@positiveButton
+                    }
+                    val songs = arguments?.getParcelableArrayList<Song>("songs")
+                        ?: return@positiveButton
 
-                        if (playlistView.text.toString().trim { it <= ' ' }.isNotEmpty()) {
-                            val playlistId = PlaylistsUtil.createPlaylist(requireContext(), playlistView.text.toString())
-                            if (playlistId != -1 && activity != null) {
-                                PlaylistsUtil.addToPlaylist(requireContext(), songs, playlistId, true)
-                            }
+                    if (playlistView.text.toString().trim { it <= ' ' }.isNotEmpty()) {
+                        val playlistId = PlaylistsUtil.createPlaylist(requireContext(), playlistView.text.toString())
+                        if (playlistId != -1 && activity != null) {
+                            PlaylistsUtil.addToPlaylist(requireContext(), songs, playlistId, true)
                         }
                     }
                 }
+            }
 
         val dialogView = materialDialog.getCustomView()
         playlistView = dialogView.findViewById(R.id.actionNewPlaylist)
@@ -73,7 +71,10 @@ class CreatePlaylistDialog : DialogFragment() {
         MaterialUtil.setTint(actionNewPlaylistContainer, false)
 
         val playlistId = arguments!!.getLong(MediaStore.Audio.Playlists.Members.PLAYLIST_ID)
-        playlistView.appHandleColor().setText(PlaylistsUtil.getNameForPlaylist(requireContext(), playlistId), TextView.BufferType.EDITABLE)
+        playlistView.setText(
+            PlaylistsUtil.getNameForPlaylist(requireContext(), playlistId),
+            TextView.BufferType.EDITABLE
+        )
         return materialDialog
     }
 
