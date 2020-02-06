@@ -28,7 +28,7 @@ import me.zhanghai.android.fastscroll.PopupTextProvider
 open class AlbumAdapter(
     protected val activity: AppCompatActivity,
     dataSet: List<Album>,
-    protected var itemLayoutRes: Int,
+    var itemLayoutRes: Int,
     cabHolder: CabHolder?
 ) : AbsMultiSelectAdapter<AlbumAdapter.ViewHolder, Album>(
     activity,

@@ -50,9 +50,10 @@ class AlbumGlideRequest {
     }
 
     class Builder(val requestManager: RequestManager, val albumId: Long) {
-
-        fun from(requestManager: RequestManager, albumId: Long): Builder {
-            return Builder(requestManager, albumId)
+        companion object {
+            fun from(requestManager: RequestManager, albumId: Long): Builder {
+                return Builder(requestManager, albumId)
+            }
         }
 
         fun generatePalette(context: Context): PaletteBuilder {

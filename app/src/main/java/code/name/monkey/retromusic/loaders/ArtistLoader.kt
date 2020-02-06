@@ -44,6 +44,13 @@ object ArtistLoader {
         } ?: Artist()
     }
 
+    fun getArtists(context: Context, paramString: String): List<Artist> {
+        return makeArtistCursor(context, "artist LIKE ?", arrayOf("$paramString%"))
+            .mapList(true) {
+                Artist.fromCursor(this)
+            }
+    }
+
     private fun getArtists(cursor: Cursor?): ArrayList<Artist> {
         val artists = ArrayList<Artist>()
         if (cursor != null && cursor.moveToFirst()) {

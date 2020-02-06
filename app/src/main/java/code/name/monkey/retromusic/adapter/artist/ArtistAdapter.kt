@@ -30,7 +30,6 @@ class ArtistAdapter(
     val activity: AppCompatActivity,
     var dataSet: ArrayList<Artist>,
     var itemLayoutRes: Int,
-
     cabHolder: CabHolder?
 ) : AbsMultiSelectAdapter<ArtistAdapter.ViewHolder, Artist>(
     activity, cabHolder, R.menu.menu_media_selection

@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
+import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
+import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.menu.SongMenuHelper
 import code.name.monkey.retromusic.loaders.PlaylistSongsLoader
@@ -60,8 +62,17 @@ class SearchAdapter(
                 val album = dataSet?.get(position) as Album
                 holder.title?.text = album.title
                 holder.text?.text = album.artist
-                /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
-                    .checkIgnoreMediaStore(activity).build().into(holder.image)*/
+                holder.image?.let {
+                    AlbumGlideRequest.Builder(Glide.with(activity), album.id)
+                        .generatePalette(activity)
+                        .build()
+                        .dontAnimate()
+                        .dontTransform()
+                        .into(object : RetroMusicColoredTarget(it) {
+                            override fun onColorReady(color: Int) {
+                            }
+                        })
+                }
             }
             ARTIST -> {
                 val artist = dataSet?.get(position) as Artist
@@ -133,21 +144,24 @@ class SearchAdapter(
             val item = dataSet!![adapterPosition]
             when (itemViewType) {
                 ALBUM -> {
+                    item as Album
                     val options = ActivityOptions.makeSceneTransitionAnimation(
                         activity,
                         UtilPair.create(image, activity.getString(R.string.transition_album_art))
                     )
-                    NavigationUtil.goToAlbumOptions(activity, (item as Album).id, options)
+                    NavigationUtil.goToAlbumOptions(activity, item.id, options)
                 }
                 ARTIST -> {
+                    item as Artist
                     val options = ActivityOptions.makeSceneTransitionAnimation(
                         activity,
                         UtilPair.create(image, activity.getString(R.string.transition_artist_image))
                     )
-                    NavigationUtil.goToArtistOptions(activity, (item as Artist).id, options)
+                    NavigationUtil.goToArtistOptions(activity, item.id, options)
                 }
                 GENRE -> {
-                    NavigationUtil.goToGenre(activity, item as Genre)
+                    item as Genre
+                    NavigationUtil.goToGenre(activity, item)
                 }
                 PLAYLIST -> {
                     NavigationUtil.goToPlaylistNew(activity, item as Playlist)

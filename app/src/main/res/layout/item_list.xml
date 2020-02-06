@@ -47,7 +47,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:scaleType="centerCrop"
-                tools:srcCompat="@tools:sample/backgrounds/scenic[16]" />
+                tools:srcCompat="@tools:sample/avatars" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/imageText"
@@ -58,8 +58,7 @@
                 android:minHeight="40dp"
                 android:textAppearance="@style/TextViewSubtitle2"
                 android:visibility="gone"
-                tools:text="100"
-                tools:visibility="visible" />
+                tools:text="100" />
         </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
 

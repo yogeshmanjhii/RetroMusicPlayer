@@ -135,6 +135,11 @@ object AlbumLoader {
         albums.add(album)
         return album
     }
+
+    fun getAlbums(context: Context, paramString: String): List<Album> {
+        return makeAlbumCursor(context, "album LIKE ?", arrayOf("$paramString%"))
+            .mapList(true) { Album.fromCursor(this) }
+    }
 }
 
 /*

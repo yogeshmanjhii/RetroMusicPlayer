@@ -44,19 +44,6 @@ class HorizontalAlbumAdapter(
                     //setColors(color, holder)
                 }
             })
-        /*SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
-            .checkIgnoreMediaStore(activity).generatePalette(activity).build()
-            .into(object : RetroMusicColoredTarget(holder.image!!) {
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    super.onLoadCleared(placeholder)
-                    setColors(albumArtistFooterColor, holder)
-                }
-
-                override fun onColorReady(color: Int) {
-                    if (usePalette) setColors(color, holder)
-                    else setColors(albumArtistFooterColor, holder)
-                }
-            })*/
     }
 
     override fun getAlbumText(album: Album): String? {
