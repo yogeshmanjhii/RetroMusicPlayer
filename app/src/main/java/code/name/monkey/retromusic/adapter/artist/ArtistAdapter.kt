@@ -30,7 +30,7 @@ class ArtistAdapter(
     val activity: AppCompatActivity,
     var dataSet: ArrayList<Artist>,
     var itemLayoutRes: Int,
-    var usePalette: Boolean,
+
     cabHolder: CabHolder?
 ) : AbsMultiSelectAdapter<ArtistAdapter.ViewHolder, Artist>(
     activity, cabHolder, R.menu.menu_media_selection
@@ -41,13 +41,8 @@ class ArtistAdapter(
         notifyDataSetChanged()
     }
 
-    fun usePalette(usePalette: Boolean) {
-        this.usePalette = usePalette
-        notifyDataSetChanged()
-    }
-
     override fun getItemId(position: Int): Long {
-        return dataSet[position].id.toLong()
+        return dataSet[position].id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

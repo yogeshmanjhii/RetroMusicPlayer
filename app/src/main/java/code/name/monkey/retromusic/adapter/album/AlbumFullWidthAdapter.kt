@@ -45,15 +45,6 @@ class AlbumFullWidthAdapter(
         val album = dataSet[position]
         holder.title?.text = getAlbumTitle(album)
         holder.text?.text = getAlbumText(album)
-        holder.playSongs?.setOnClickListener {
-            /*album.songs?.let { songs ->
-                MusicPlayerRemote.openQueue(
-                    songs,
-                    0,
-                    true
-                )
-            }*/
-        }
         loadAlbumCover(album, holder)
     }
 

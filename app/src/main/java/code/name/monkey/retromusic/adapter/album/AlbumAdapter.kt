@@ -29,7 +29,6 @@ open class AlbumAdapter(
     protected val activity: AppCompatActivity,
     dataSet: List<Album>,
     protected var itemLayoutRes: Int,
-    usePalette: Boolean,
     cabHolder: CabHolder?
 ) : AbsMultiSelectAdapter<AlbumAdapter.ViewHolder, Album>(
     activity,
@@ -40,22 +39,9 @@ open class AlbumAdapter(
     var dataSet: List<Album>
         protected set
 
-    protected var usePalette = false
-
     init {
         this.dataSet = dataSet
-        this.usePalette = usePalette
         this.setHasStableIds(true)
-    }
-
-    fun useItemLayout(itemLayoutRes: Int) {
-        this.itemLayoutRes = itemLayoutRes
-        notifyDataSetChanged()
-    }
-
-    fun usePalette(usePalette: Boolean) {
-        this.usePalette = usePalette
-        notifyDataSetChanged()
     }
 
     fun swapDataSet(dataSet: List<Album>) {
@@ -86,15 +72,6 @@ open class AlbumAdapter(
         holder.itemView.isActivated = isChecked
         holder.title?.text = getAlbumTitle(album)
         holder.text?.text = getAlbumText(album)
-        holder.playSongs?.setOnClickListener {
-            /*album.songs?.let { songs ->
-                MusicPlayerRemote.openQueue(
-                    songs,
-                    0,
-                    true
-                )
-            }*/
-        }
         loadAlbumCover(album, holder)
     }
 

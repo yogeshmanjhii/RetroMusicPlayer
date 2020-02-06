@@ -121,7 +121,6 @@ class HomeAdapter(
                         activity,
                         list,
                         PreferenceUtil.getInstance(activity).getHomeGridStyle(activity),
-                        false,
                         null
                     )
                     adapter = artistAdapter

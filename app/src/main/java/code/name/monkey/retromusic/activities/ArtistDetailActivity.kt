@@ -22,10 +22,12 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.base.AbsSlidingMusicPanelActivity
 import code.name.monkey.retromusic.adapter.album.HorizontalAlbumAdapter
 import code.name.monkey.retromusic.adapter.song.SimpleSongAdapter
+import code.name.monkey.retromusic.dialogs.AddToPlaylistDialog
 import code.name.monkey.retromusic.extensions.ripAlpha
 import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
+import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.CabHolder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
@@ -57,7 +59,6 @@ import kotlinx.android.synthetic.main.activity_artist_details.artistTitle
 import kotlinx.android.synthetic.main.activity_artist_details.image
 import kotlinx.android.synthetic.main.activity_artist_details.text
 import kotlinx.android.synthetic.main.activity_artist_details.toolbar
-import java.text.DecimalFormat
 import java.util.Locale
 import javax.inject.Inject
 
@@ -84,6 +85,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
     private var cab: MaterialCab? = null
     private var biography: Spanned? = null
     private lateinit var artist: Artist
+    private lateinit var songs: List<Song>
     private lateinit var songAdapter: SimpleSongAdapter
     private lateinit var albumAdapter: HorizontalAlbumAdapter
     private var forceDownload: Boolean = false
@@ -133,10 +135,10 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         setupRecyclerView()
 
         playAction.apply {
-            //setOnClickListener { MusicPlayerRemote.openQueue(artist.songs, 0, true) }
+            setOnClickListener { MusicPlayerRemote.openQueue(songs, 0, true) }
         }
         shuffleAction.apply {
-            //setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(artist.songs, true) }
+            setOnClickListener { MusicPlayerRemote.openAndShuffleQueue(songs, true) }
         }
 
         biographyText.setOnClickListener {
@@ -154,7 +156,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
     }
 
     private fun setupRecyclerView() {
-        albumAdapter = HorizontalAlbumAdapter(this, ArrayList(), false, null)
+        albumAdapter = HorizontalAlbumAdapter(this, ArrayList(),   null)
         albumRecyclerView.apply {
             itemAnimator = DefaultItemAnimator()
             layoutManager = GridLayoutManager(this.context, 1, GridLayoutManager.HORIZONTAL, false)
@@ -190,6 +192,7 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
     }
 
     override fun songs(songs: List<Song>) {
+        this.songs = songs
         songAdapter.swapDataSet(songs)
     }
 
@@ -287,22 +290,10 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
         MaterialUtil.setTint(button = playAction, color = buttonColor)
 
         val toolbarColor = ATHUtil.resolveColor(this, R.attr.colorSurface)
-        //status_bar.setBackgroundColor(toolbarColor)
+
         toolbar.setBackgroundColor(toolbarColor)
         setSupportActionBar(toolbar)
         supportActionBar?.title = null
-    }
-
-    private fun numberFormat(count: Float): String {
-        val prefixes = arrayOf("", "K", "M", "B", "T", "P", "E")
-        var index = 0
-        var finalCount = count
-        while (finalCount / 1000 >= 1) {
-            finalCount /= 1000
-            index++
-        }
-        val decimal = DecimalFormat("#.##")
-        return String.format("%s %s", decimal.format(finalCount), prefixes[index])
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -310,22 +301,21 @@ class ArtistDetailActivity : AbsSlidingMusicPanelActivity(), ArtistDetailsView, 
     }
 
     private fun handleSortOrderMenuItem(item: MenuItem): Boolean {
-        //val songs = artist.songs
         when (item.itemId) {
             android.R.id.home -> {
                 super.onBackPressed()
                 return true
             }
             R.id.action_play_next -> {
-                //MusicPlayerRemote.playNext(songs)
+                MusicPlayerRemote.playNext(songs)
                 return true
             }
             R.id.action_add_to_current_playing -> {
-                //MusicPlayerRemote.enqueue(songs)
+                MusicPlayerRemote.enqueue(songs)
                 return true
             }
             R.id.action_add_to_playlist -> {
-                //AddToPlaylistDialog.create(songs).show(supportFragmentManager, "ADD_PLAYLIST")
+                AddToPlaylistDialog.create(songs).show(supportFragmentManager, "ADD_PLAYLIST")
                 return true
             }
             R.id.action_set_artist_image -> {

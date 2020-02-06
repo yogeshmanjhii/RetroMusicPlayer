@@ -73,17 +73,6 @@ class SongsFragment : AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdap
         PreferenceUtil.getInstance(requireContext()).setSongGridSizeLand(gridColumns)
     }
 
-    public override fun saveUsePalette(usePalette: Boolean) {
-        PreferenceUtil.getInstance(requireContext()).setSongColoredFooters(usePalette)
-    }
-
-    public override fun loadUsePalette(): Boolean {
-        return PreferenceUtil.getInstance(requireContext()).songColoredFooters()
-    }
-
-    public override fun setUsePalette(usePalette: Boolean) {
-    }
-
     override fun setGridSize(gridSize: Int) {
         adapter?.notifyDataSetChanged()
     }

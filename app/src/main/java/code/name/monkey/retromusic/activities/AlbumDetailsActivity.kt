@@ -208,7 +208,7 @@ class AlbumDetailsActivity : AbsSlidingMusicPanelActivity(), AlbumDetailsView, C
         moreRecyclerView.show()
         moreTitle.text = String.format(getString(R.string.label_more_from), album.artist)
 
-        val albumAdapter = HorizontalAlbumAdapter(this, albums, false, null)
+        val albumAdapter = HorizontalAlbumAdapter(this, albums, null)
         moreRecyclerView.layoutManager = GridLayoutManager(
             this,
             1,

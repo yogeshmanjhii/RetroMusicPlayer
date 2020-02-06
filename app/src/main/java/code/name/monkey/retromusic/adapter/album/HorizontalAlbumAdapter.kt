@@ -16,10 +16,9 @@ import java.util.ArrayList
 class HorizontalAlbumAdapter(
     activity: AppCompatActivity,
     dataSet: ArrayList<Album>,
-    usePalette: Boolean,
     cabHolder: CabHolder?
 ) : AlbumAdapter(
-    activity, dataSet, HorizontalAdapterHelper.LAYOUT_RES, usePalette, cabHolder
+    activity, dataSet, HorizontalAdapterHelper.LAYOUT_RES, cabHolder
 ) {
 
     override fun createViewHolder(view: View, viewType: Int): ViewHolder {

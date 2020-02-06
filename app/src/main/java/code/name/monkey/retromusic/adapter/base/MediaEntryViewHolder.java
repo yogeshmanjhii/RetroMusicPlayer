@@ -17,7 +17,6 @@ package code.name.monkey.retromusic.adapter.base;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -60,8 +59,6 @@ public class MediaEntryViewHolder extends AbstractDraggableSwipeableItemViewHold
     @Nullable
     public View paletteColorContainer;
 
-    @Nullable
-    public ImageButton playSongs;
 
     @Nullable
     public RecyclerView recyclerView;
@@ -93,7 +90,6 @@ public class MediaEntryViewHolder extends AbstractDraggableSwipeableItemViewHold
         paletteColorContainer = itemView.findViewById(R.id.paletteColorContainer);
         recyclerView = itemView.findViewById(R.id.recycler_view);
         mask = itemView.findViewById(R.id.mask);
-        playSongs = itemView.findViewById(R.id.playSongs);
         dummyContainer = itemView.findViewById(R.id.dummy_view);
 
         if (imageContainerCard != null) {
