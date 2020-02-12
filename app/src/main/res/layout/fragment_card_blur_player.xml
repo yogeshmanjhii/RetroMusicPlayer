@@ -5,19 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
+    android:background="?attr/colorSurface"
     android:focusable="true">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/colorBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
         android:scaleType="centerCrop" />
-
-    <View
-        android:id="@+id/mask"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#20000000" />
 
     <include layout="@layout/shadow_statusbar_toolbar" />
 
@@ -86,5 +82,4 @@
                 tools:layout="@layout/fragment_card_blur_player_playback_controls" />
         </FrameLayout>
     </FrameLayout>
-
 </FrameLayout>

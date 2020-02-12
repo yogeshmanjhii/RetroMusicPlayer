@@ -13,9 +13,9 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.fragments.base.AbsPlayerFragment
 import code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment
 import code.name.monkey.retromusic.fragments.player.normal.PlayerFragment
+import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.BlurTransformation
 import code.name.monkey.retromusic.glide.RetroMusicColoredTarget
-import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
@@ -53,7 +53,7 @@ class CardBlurFragment : AbsPlayerFragment(), SharedPreferences.OnSharedPreferen
     override fun onColorChanged(color: Int) {
         playbackControlsFragment.setDark(color)
         lastColor = color
-        callbacks!!.onPaletteColorChanged()
+        callbacks?.onPaletteColorChanged()
         ToolbarContentTintHelper.colorizeToolbar(playerToolbar, Color.WHITE, activity)
 
         playerToolbar.setTitleTextColor(Color.WHITE)
@@ -127,10 +127,19 @@ class CardBlurFragment : AbsPlayerFragment(), SharedPreferences.OnSharedPreferen
     }
 
     private fun updateBlur() {
+        colorBackground?.clearColorFilter()
         val blurAmount = PreferenceManager.getDefaultSharedPreferences(requireContext())
             .getInt(PreferenceUtil.NEW_BLUR_AMOUNT, 25)
-        colorBackground!!.clearColorFilter()
-        SongGlideRequest.Builder.from(Glide.with(requireActivity()), MusicPlayerRemote.currentSong)
+        AlbumGlideRequest.Builder.from(Glide.with(requireContext()), MusicPlayerRemote.currentSong.albumId)
+            .generatePalette(requireContext())
+            .build()
+            .transform(BlurTransformation.Builder(requireContext()).blurRadius(blurAmount.toFloat()).build())
+            .into(object : RetroMusicColoredTarget(colorBackground) {
+                override fun onColorReady(color: Int) {
+                }
+            })
+        //colorBackground?.clearColorFilter()
+        /*SongGlideRequest.Builder.from(Glide.with(requireActivity()), MusicPlayerRemote.currentSong)
             .checkIgnoreMediaStore(requireContext())
             .generatePalette(requireContext()).build()
             .transform(BlurTransformation.Builder(requireContext()).blurRadius(blurAmount.toFloat()).build())
@@ -138,11 +147,9 @@ class CardBlurFragment : AbsPlayerFragment(), SharedPreferences.OnSharedPreferen
             //.override(320, 480)
             .into(object : RetroMusicColoredTarget(colorBackground) {
                 override fun onColorReady(color: Int) {
-                    if (color == defaultFooterColor) {
-                        colorBackground!!.setColorFilter(color)
-                    }
+
                 }
-            })
+            })*/
     }
 
     override fun onResume() {

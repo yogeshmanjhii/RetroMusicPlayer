@@ -29,8 +29,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.list.listItems
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Collections
+import java.util.Comparator
 
 class BlacklistFolderChooserDialog : DialogFragment() {
 
@@ -39,7 +39,6 @@ class BlacklistFolderChooserDialog : DialogFragment() {
     private var parentContents: Array<File>? = null
     private var canGoUp = false
     private var callback: FolderCallback? = null
-
 
     private fun contentsArray(): List<String> {
         if (parentContents == null) {
@@ -81,7 +80,11 @@ class BlacklistFolderChooserDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         var savedInstanceStateFinal = savedInstanceState
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             return MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 title(R.string.md_error_label)
                 cornerRadius(PreferenceUtil.getInstance(requireContext()).dialogCorner)

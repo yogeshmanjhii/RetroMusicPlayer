@@ -99,7 +99,7 @@ class BlurPlayerFragment : AbsPlayerFragment(), SharedPreferences.OnSharedPrefer
     private fun updateBlur() {
         val blurAmount = PreferenceManager.getDefaultSharedPreferences(requireContext())
             .getInt(PreferenceUtil.NEW_BLUR_AMOUNT, 25)
-        colorBackground!!.clearColorFilter()
+        colorBackground?.clearColorFilter()
         SongGlideRequest.Builder.from(Glide.with(requireActivity()), MusicPlayerRemote.currentSong)
             .checkIgnoreMediaStore(requireContext())
             .generatePalette(requireContext()).build()
@@ -109,7 +109,7 @@ class BlurPlayerFragment : AbsPlayerFragment(), SharedPreferences.OnSharedPrefer
             .into(object : RetroMusicColoredTarget(colorBackground) {
                 override fun onColorReady(color: Int) {
                     if (color == defaultFooterColor) {
-                        colorBackground!!.setColorFilter(color)
+                        colorBackground?.setColorFilter(color)
                     }
                 }
             })

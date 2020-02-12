@@ -18,10 +18,9 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns
-import code.name.monkey.retromusic.Constants.BASE_SELECTION
 import code.name.monkey.retromusic.Constants.baseProjection
+import code.name.monkey.retromusic.Constants.baseSelection
 import code.name.monkey.retromusic.model.Song
-import code.name.monkey.retromusic.providers.BlacklistStore
 import code.name.monkey.retromusic.util.PreferenceUtil
 import java.util.ArrayList
 
@@ -61,7 +60,7 @@ object SongLoader {
         return getSongs(cursor)
     }
 
-    fun getSong(
+    private fun getSong(
         cursor: Cursor?
     ): Song {
         val song: Song
@@ -84,71 +83,70 @@ object SongLoader {
         cursor: Cursor
     ): Song = Song.fromCursor(cursor)
 
+    @JvmStatic
     @JvmOverloads
     fun makeSongCursor(
         context: Context,
-        selection: String?,
-        selectionValues: Array<String>?,
+        selectionString: String?,
+        selectionValuesArray: Array<String>?,
         sortOrder: String = PreferenceUtil.getInstance(context).songSortOrder
-    ): Cursor? {
-        var selectionFinal = selection
-        var selectionValuesFinal = selectionValues
-        selectionFinal = if (selection != null && selection.trim { it <= ' ' } != "") {
-            "$BASE_SELECTION AND $selectionFinal"
+    ): Cursor {
+        var selectionValues: Array<String>? = arrayOf()
+        var selection = if (selectionString != null && selectionString.trim() != "") {
+            "$baseSelection AND $selectionString"
         } else {
-            BASE_SELECTION
+            baseSelection
         }
 
         // Blacklist
-        val paths = BlacklistStore.getInstance(context).paths
+        /*val paths = BlacklistStore.getInstance(context).paths
         if (paths.isNotEmpty()) {
-            selectionFinal = generateBlacklistSelection(selectionFinal, paths.size)
-            selectionValuesFinal = addBlacklistSelectionValues(selectionValuesFinal, paths)
+            selection = generateBlacklistSelection(selection, paths.size)
+            selectionValues = addBlacklistSelectionValues(selectionValuesArray, paths)
+        }*/
+        if (PreferenceUtil.getInstance(context).filterLength != 0) {
+            selection =
+                "$selection AND ${MediaStore.Audio.Media.DURATION} >= ${PreferenceUtil.getInstance(context).filterLength * 1000}"
         }
 
-        try {
-            return context.contentResolver.query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                baseProjection,
-                selectionFinal + " AND " + MediaStore.Audio.Media.DURATION + ">= " + (PreferenceUtil.getInstance(
-                    context
-                ).filterLength * 1000),
-                selectionValuesFinal,
-                sortOrder
-            )
-        } catch (e: SecurityException) {
-            return null
-        }
+        return context.contentResolver.query(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            baseProjection,
+            selection,
+            selectionValuesArray,
+            sortOrder
+        )
+            ?: throw IllegalStateException("Unable to query ${MediaStore.Audio.Media.EXTERNAL_CONTENT_URI}, system returned null.")
     }
+}
 
-    private fun generateBlacklistSelection(
-        selection: String?,
-        pathCount: Int
-    ): String {
-        val newSelection = StringBuilder(
-            if (selection != null && selection.trim { it <= ' ' } != "") "$selection AND " else "")
-        newSelection.append(AudioColumns.DATA + " NOT LIKE ?")
-        for (i in 0 until pathCount - 1) {
-            newSelection.append(" AND " + AudioColumns.DATA + " NOT LIKE ?")
-        }
-        return newSelection.toString()
+fun generateBlacklistSelection(
+    selection: String?,
+    pathCount: Int
+): String {
+    val newSelection = StringBuilder(
+        if (selection != null && selection.trim { it <= ' ' } != "") "$selection AND " else "")
+    newSelection.append(AudioColumns.DATA + " NOT LIKE ?")
+    for (i in 0 until pathCount - 1) {
+        newSelection.append(" AND " + AudioColumns.DATA + " NOT LIKE ?")
     }
+    return newSelection.toString()
+}
 
-    private fun addBlacklistSelectionValues(
-        selectionValues: Array<String>?,
-        paths: ArrayList<String>
-    ): Array<String>? {
-        var selectionValuesFinal = selectionValues
-        if (selectionValuesFinal == null) {
-            selectionValuesFinal = emptyArray()
-        }
-        val newSelectionValues = Array(selectionValuesFinal.size + paths.size) {
-            "n = $it"
-        }
-        System.arraycopy(selectionValuesFinal, 0, newSelectionValues, 0, selectionValuesFinal.size)
-        for (i in selectionValuesFinal.size until newSelectionValues.size) {
-            newSelectionValues[i] = paths[i - selectionValuesFinal.size] + "%"
-        }
-        return newSelectionValues
+fun addBlacklistSelectionValues(
+    selectionValues: Array<String>?,
+    paths: ArrayList<String>
+): Array<String>? {
+    var selectionValuesFinal = selectionValues
+    if (selectionValuesFinal == null) {
+        selectionValuesFinal = emptyArray()
     }
+    val newSelectionValues = Array(selectionValuesFinal.size + paths.size) {
+        "n = $it"
+    }
+    System.arraycopy(selectionValuesFinal, 0, newSelectionValues, 0, selectionValuesFinal.size)
+    for (i in selectionValuesFinal.size until newSelectionValues.size) {
+        newSelectionValues[i] = paths[i - selectionValuesFinal.size] + "%"
+    }
+    return newSelectionValues
 }

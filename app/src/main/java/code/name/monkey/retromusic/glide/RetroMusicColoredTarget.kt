@@ -20,10 +20,8 @@ import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteTarget
 import code.name.monkey.retromusic.glide.palette.BitmapPaletteWrapper
-import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.RetroColorUtil
 import com.bumptech.glide.request.animation.GlideAnimation
-
 
 abstract class RetroMusicColoredTarget(view: ImageView) : BitmapPaletteTarget(view) {
 
@@ -40,15 +38,17 @@ abstract class RetroMusicColoredTarget(view: ImageView) : BitmapPaletteTarget(vi
         onColorReady(defaultFooterColor)
     }
 
-    override fun onResourceReady(resource: BitmapPaletteWrapper?, glideAnimation: GlideAnimation<in BitmapPaletteWrapper>?) {
+    override fun onResourceReady(
+        resource: BitmapPaletteWrapper?,
+        glideAnimation: GlideAnimation<in BitmapPaletteWrapper>?
+    ) {
         super.onResourceReady(resource, glideAnimation)
         val defaultColor = defaultFooterColor
 
         resource?.let {
-            onColorReady(if (PreferenceUtil.getInstance(getView().context).isDominantColor)
-                RetroColorUtil.getDominantColor(it.bitmap, defaultColor)
-            else
-                RetroColorUtil.getColor(it.palette, defaultColor))
+            onColorReady(
+                RetroColorUtil.getColor(it.palette, defaultColor)
+            )
         }
     }
 }

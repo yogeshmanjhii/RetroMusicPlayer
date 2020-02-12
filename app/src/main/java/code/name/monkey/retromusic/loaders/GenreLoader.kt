@@ -19,7 +19,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.MediaStore.Audio.Genres
-import code.name.monkey.retromusic.Constants.BASE_SELECTION
+import code.name.monkey.retromusic.Constants.baseSelection
 import code.name.monkey.retromusic.Constants.baseProjection
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Song
@@ -94,7 +94,7 @@ object GenreLoader {
         try {
             return context.contentResolver.query(
                     Genres.Members.getContentUri("external", genreId.toLong()),
-                    baseProjection, BASE_SELECTION, null, PreferenceUtil.getInstance(context).songSortOrder)
+                    baseProjection, baseSelection, null, PreferenceUtil.getInstance(context).songSortOrder)
         } catch (e: SecurityException) {
             return null
         }
