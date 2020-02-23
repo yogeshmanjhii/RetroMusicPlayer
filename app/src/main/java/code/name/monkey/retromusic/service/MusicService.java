@@ -62,8 +62,8 @@ import code.name.monkey.retromusic.helper.ShuffleHelper;
 import code.name.monkey.retromusic.model.Playlist;
 import code.name.monkey.retromusic.model.Song;
 import code.name.monkey.retromusic.providers.HistoryStore;
-import code.name.monkey.retromusic.providers.MusicPlaybackQueueStore;
 import code.name.monkey.retromusic.providers.SongPlayCountStore;
+import code.name.monkey.retromusic.room.MusicPlaybackQueueStoreKt;
 import code.name.monkey.retromusic.service.notification.PlayingNotification;
 import code.name.monkey.retromusic.service.notification.PlayingNotificationImpl;
 import code.name.monkey.retromusic.service.notification.PlayingNotificationOreo;
@@ -229,6 +229,8 @@ public class MusicService extends Service implements
 
     private boolean headsetReceiverRegistered = false;
 
+    private MusicPlaybackQueueStoreKt mMusicPlaybackQueueStore;
+
     private MediaSessionCompat mediaSession;
 
     private ContentObserver mediaStoreObserver;
@@ -239,7 +241,7 @@ public class MusicService extends Service implements
 
     private boolean notHandledMetaChangedForCurrentTrack;
 
-    private ArrayList<Song> originalPlayingQueue = new ArrayList<>();
+    private List<Song> originalPlayingQueue = new ArrayList<>();
 
     private boolean pausedByTransientLossOfFocus;
 
@@ -264,7 +266,7 @@ public class MusicService extends Service implements
 
     private PlayingNotification playingNotification;
 
-    private ArrayList<Song> playingQueue = new ArrayList<>();
+    private List<Song> playingQueue = new ArrayList<>();
 
     private QueueSaveHandler queueSaveHandler;
 
@@ -387,6 +389,7 @@ public class MusicService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+        mMusicPlaybackQueueStore = new MusicPlaybackQueueStoreKt(this);
 
         final TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if (telephonyManager != null) {
@@ -452,6 +455,8 @@ public class MusicService extends Service implements
 
         registerHeadsetEvents();
         registerBluetoothConnected();
+
+
     }
 
     @Override
@@ -503,6 +508,7 @@ public class MusicService extends Service implements
     }
 
     public void addSongs(List<Song> songs) {
+        mMusicPlaybackQueueStore.saveQueue(songs);
         playingQueue.addAll(songs);
         originalPlayingQueue.addAll(songs);
         notifyChange(QUEUE_CHANGED);
@@ -583,7 +589,7 @@ public class MusicService extends Service implements
     }
 
     @Nullable
-    public ArrayList<Song> getPlayingQueue() {
+    public List<Song> getPlayingQueue() {
         return playingQueue;
     }
 
@@ -1045,9 +1051,14 @@ public class MusicService extends Service implements
 
     public synchronized void restoreQueuesAndPositionIfNecessary() {
         if (!queuesRestored && playingQueue.isEmpty()) {
-            ArrayList<Song> restoredQueue = MusicPlaybackQueueStore.getInstance(this).getSavedPlayingQueue();
-            ArrayList<Song> restoredOriginalQueue = MusicPlaybackQueueStore.getInstance(this)
-                    .getSavedOriginalPlayingQueue();
+            final List<Song> queue = mMusicPlaybackQueueStore.getQueue();
+
+            List<Song> restoredQueue = mMusicPlaybackQueueStore.getQueue();
+            Log.i(TAG, "restoreQueuesAndPositionIfNecessary: Room -> " + queue.size() + " Legacy -> " + restoredQueue
+                    .size());
+
+            List<Song> restoredOriginalQueue = mMusicPlaybackQueueStore.getOriginalQueue();
+
             int restoredPosition = PreferenceManager.getDefaultSharedPreferences(this).getInt(SAVED_POSITION, -1);
             int restoredPositionInTrack = PreferenceManager.getDefaultSharedPreferences(this)
                     .getInt(SAVED_POSITION_IN_TRACK, -1);
@@ -1083,7 +1094,9 @@ public class MusicService extends Service implements
     }
 
     public void saveQueuesImpl() {
-        MusicPlaybackQueueStore.getInstance(this).saveQueues(playingQueue, originalPlayingQueue);
+        mMusicPlaybackQueueStore.saveQueue(playingQueue);
+        mMusicPlaybackQueueStore.saveOriginalQueue(playingQueue);
+        //MusicPlaybackQueueStore.getInstance(this).saveQueues(playingQueue, originalPlayingQueue);
     }
 
     public void saveState() {

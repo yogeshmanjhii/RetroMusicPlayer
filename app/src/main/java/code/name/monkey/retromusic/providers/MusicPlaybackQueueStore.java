@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import code.name.monkey.retromusic.loaders.SongLoader;
 import code.name.monkey.retromusic.model.Song;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Neal, modified for Phonograph by Karim Abou Zeid
@@ -97,8 +98,8 @@ public class MusicPlaybackQueueStore extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public synchronized void saveQueues(@NonNull final ArrayList<Song> playingQueue,
-            @NonNull final ArrayList<Song> originalPlayingQueue) {
+    public synchronized void saveQueues(@NonNull final List<Song> playingQueue,
+            @NonNull final List<Song> originalPlayingQueue) {
         saveQueue(PLAYING_QUEUE_TABLE_NAME, playingQueue);
         saveQueue(ORIGINAL_PLAYING_QUEUE_TABLE_NAME, originalPlayingQueue);
     }
@@ -162,7 +163,7 @@ public class MusicPlaybackQueueStore extends SQLiteOpenHelper {
      *
      * @param queue the queue to save
      */
-    private synchronized void saveQueue(final String tableName, @NonNull final ArrayList<Song> queue) {
+    private synchronized void saveQueue(final String tableName, @NonNull final List<Song> queue) {
         final SQLiteDatabase database = getWritableDatabase();
         database.beginTransaction();
 

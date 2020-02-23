@@ -143,7 +143,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity
         });
 
         if (savedInstanceState == null) {
-            setMusicChooser(PreferenceUtil.getInstance(this).getLastMusicChooser());
+            selectedFragment(PreferenceUtil.getInstance(this).getLastPage());
         } else {
             restoreCurrentFragment();
         }
@@ -352,12 +352,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity
     }
 
     public void setMusicChooser(final int option) {
-        PreferenceUtil.getInstance(this).setLastMusicChooser(option);
-        if (option == OptionsSheetDialogFragment.FOLDER) {
-            setCurrentFragment(FoldersFragment.newInstance(this), FoldersFragment.TAG);
-        } else {
-            selectedFragment(PreferenceUtil.getInstance(this).getLastPage());
-        }
+        selectedFragment(PreferenceUtil.getInstance(this).getLastPage());
     }
 
     @NotNull
