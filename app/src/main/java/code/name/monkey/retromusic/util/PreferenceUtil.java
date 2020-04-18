@@ -185,7 +185,7 @@ public final class PreferenceUtil {
 
     private static final String AUTO_DOWNLOAD_IMAGES_POLICY = "auto_download_images_policy";
 
-    private static final String START_DIRECTORY = "start_directory";
+    private static final String START_DIRECTORY = "start_directory_";
 
     private static final String SYNCHRONIZED_LYRICS_SHOW = "synchronized_lyrics_show";
 

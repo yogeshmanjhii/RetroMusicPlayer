@@ -34,20 +34,36 @@ class HomeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val layout = LayoutInflater.from(activity)
-            .inflate(R.layout.section_recycler_view, parent, false)
+        println("onCreateViewHolder: $viewType")
         return when (viewType) {
-            RECENT_ARTISTS, TOP_ARTISTS -> ArtistViewHolder(layout)
-            PLAYLISTS -> PlaylistViewHolder(layout)
-            else -> {
-                AlbumViewHolder(
-                    LayoutInflater.from(activity).inflate(
-                        R.layout.metal_section_recycler_view,
-                        parent,
-                        false
-                    )
+            RECENT_ARTISTS, TOP_ARTISTS -> ArtistViewHolder(
+                LayoutInflater.from(activity).inflate(
+                    R.layout.section_recycler_view,
+                    parent,
+                    false
                 )
-            }
+            )
+            PLAYLISTS -> PlaylistViewHolder(
+                LayoutInflater.from(activity).inflate(
+                    R.layout.section_recycler_view,
+                    parent,
+                    false
+                )
+            )
+            /*TOP_ALBUMS, RECENT_ALBUMS -> AlbumViewHolder(
+                LayoutInflater.from(activity).inflate(
+                    R.layout.metal_section_recycler_view,
+                    parent,
+                    false
+                )
+            )*/
+            else -> AlbumViewHolder(
+                LayoutInflater.from(activity).inflate(
+                    R.layout.metal_section_recycler_view,
+                    parent,
+                    false
+                )
+            )
         }
     }
 
@@ -63,13 +79,17 @@ class HomeAdapter(
             }
             RECENT_ARTISTS -> {
                 val viewHolder = holder as ArtistViewHolder
-                viewHolder.bindView(list[position].arrayList.toArtists(), R.string.recent_artists)
+                viewHolder.bindView(
+                    list[position].arrayList.toArtists(),
+                    R.string.recent_artists
+                )
             }
             TOP_ARTISTS -> {
                 val viewHolder = holder as ArtistViewHolder
                 viewHolder.bindView(list[position].arrayList.toArtists(), R.string.top_artists)
             }
             PLAYLISTS -> {
+
                 val viewHolder = holder as PlaylistViewHolder
                 viewHolder.bindView(list[position].arrayList.toPlaylist(), R.string.favorites)
             }
@@ -91,14 +111,18 @@ class HomeAdapter(
         @Retention(AnnotationRetention.SOURCE)
         annotation class HomeSection
 
-        const val RECENT_ALBUMS = 3
-        const val TOP_ALBUMS = 1
-        const val RECENT_ARTISTS = 2
-        const val TOP_ARTISTS = 0
-        const val PLAYLISTS = 4
+        const val RECENT_ALBUMS = 4
+        const val TOP_ALBUMS = 2
+        const val RECENT_ARTISTS = 3
+        const val TOP_ARTISTS = 1
+        const val PLAYLISTS = 5
     }
 
-    private inner class AlbumViewHolder(view: View) : AbsHomeViewItem(view) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    }
+
+    inner class AlbumViewHolder(view: View) : AbsHomeViewItem(view) {
         fun bindView(list: ArrayList<Album>, titleRes: Int) {
             if (list.isNotEmpty()) {
                 recyclerView.apply {
@@ -130,7 +154,7 @@ class HomeAdapter(
         }
     }
 
-    private inner class PlaylistViewHolder(view: View) : AbsHomeViewItem(view) {
+    inner class PlaylistViewHolder(view: View) : AbsHomeViewItem(view) {
         fun bindView(arrayList: ArrayList<Playlist>, titleRes: Int) {
             if (arrayList.isNotEmpty()) {
                 val songs = PlaylistSongsLoader.getPlaylistSongList(activity, arrayList[0])

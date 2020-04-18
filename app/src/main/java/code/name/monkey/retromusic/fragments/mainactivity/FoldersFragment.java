@@ -24,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.webkit.MimeTypeMap;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -34,7 +33,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialcab.MaterialCab;
@@ -50,7 +48,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import code.name.monkey.appthemehelper.ThemeStore;
 import code.name.monkey.appthemehelper.util.ATHUtil;
@@ -67,20 +64,16 @@ import code.name.monkey.retromusic.misc.DialogAsyncTask;
 import code.name.monkey.retromusic.misc.UpdateToastMediaScannerCompletionListener;
 import code.name.monkey.retromusic.misc.WrappedAsyncTaskLoader;
 import code.name.monkey.retromusic.model.Song;
-import code.name.monkey.retromusic.util.DensityUtil;
 import code.name.monkey.retromusic.util.FileUtil;
 import code.name.monkey.retromusic.util.PreferenceUtil;
 import code.name.monkey.retromusic.util.RetroColorUtil;
 import code.name.monkey.retromusic.util.ThemedFastScroller;
-import code.name.monkey.retromusic.views.BreadCrumbLayout;
 import code.name.monkey.retromusic.views.ScrollingViewOnApplyWindowInsetsListener;
 import dev.olog.scrollhelper.layoutmanagers.OverScrollLinearLayoutManager;
 import me.zhanghai.android.fastscroll.FastScroller;
 
 public class FoldersFragment extends AbsMainActivityFragment implements
-        MainActivityFragmentCallbacks,
-        CabHolder, BreadCrumbLayout.SelectionCallback, SongFileAdapter.Callbacks,
-        LoaderManager.LoaderCallbacks<List<File>> {
+        MainActivityFragmentCallbacks, CabHolder, SongFileAdapter.Callbacks, LoaderManager.LoaderCallbacks<List<File>> {
 
     public static final String TAG = FoldersFragment.class.getSimpleName();
     public static final FileFilter AUDIO_FILE_FILTER = file -> !file.isHidden() && (file.isDirectory() ||
@@ -88,11 +81,11 @@ public class FoldersFragment extends AbsMainActivityFragment implements
             FileUtil.fileIsMimeType(file, "application/opus", MimeTypeMap.getSingleton()) ||
             FileUtil.fileIsMimeType(file, "application/ogg", MimeTypeMap.getSingleton()));
     private static final String PATH = "path";
-    private static final String CRUMBS = "crumbs";
     private static final int LOADER_ID = LoaderIds.Companion.getFOLDERS_FRAGMENT();
     private SongFileAdapter adapter;
-    private BreadCrumbLayout breadCrumbs;
+
     private MaterialCab cab;
+    private File file;
     private View coordinatorLayout, empty;
     private TextView emojiText;
     private Comparator<File> fileComparator = (lhs, rhs) -> {
@@ -111,7 +104,7 @@ public class FoldersFragment extends AbsMainActivityFragment implements
     }
 
     public static File getDefaultStartDirectory() {
-        File musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        File musicDir = Environment.getExternalStorageDirectory();
         File startFolder;
         if (musicDir.exists() && musicDir.isDirectory()) {
             startFolder = musicDir;
@@ -160,8 +153,6 @@ public class FoldersFragment extends AbsMainActivityFragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setStatusBarColorAuto(view);
-        setUpAppbarColor();
-        setUpBreadCrumbs();
         setUpRecyclerView();
         setUpAdapter();
     }
@@ -172,37 +163,17 @@ public class FoldersFragment extends AbsMainActivityFragment implements
 
         if (savedInstanceState == null) {
             //noinspection ConstantConditions
-            setCrumb(new BreadCrumbLayout.Crumb(
-                    FileUtil.safeGetCanonicalFile((File) getArguments().getSerializable(PATH))), true);
+            setCrumb(FileUtil.safeGetCanonicalFile((File) getArguments().getSerializable(PATH)));
         } else {
-            breadCrumbs.restoreFromStateWrapper(savedInstanceState.getParcelable(CRUMBS));
+
             getLoaderManager().initLoader(LOADER_ID, null, this);
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveScrollPosition();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (breadCrumbs != null) {
-            outState.putParcelable(CRUMBS, breadCrumbs.getStateWrapper());
-        }
-
     }
 
     @Override
     public boolean handleBackPress() {
         if (cab != null && cab.isActive()) {
             cab.finish();
-            return true;
-        }
-        if (breadCrumbs != null && breadCrumbs.popHistory()) {
-            setCrumb(breadCrumbs.lastHistory(), false);
             return true;
         }
         return false;
@@ -214,10 +185,6 @@ public class FoldersFragment extends AbsMainActivityFragment implements
         return new AsyncFileLoader(this);
     }
 
-    @Override
-    public void onCrumbSelection(BreadCrumbLayout.Crumb crumb, int index) {
-        setCrumb(crumb, true);
-    }
 
     @Override
     public void onFileMenuClicked(final File file, View view) {
@@ -287,7 +254,7 @@ public class FoldersFragment extends AbsMainActivityFragment implements
     public void onFileSelected(File file) {
         file = tryGetCanonicalFile(file); // important as we compare the path value later
         if (file.isDirectory()) {
-            setCrumb(new BreadCrumbLayout.Crumb(file), true);
+            setCrumb(file);
         } else {
             FileFilter fileFilter = pathname -> !pathname.isDirectory() && AUDIO_FILE_FILTER
                     .accept(pathname);
@@ -341,32 +308,19 @@ public class FoldersFragment extends AbsMainActivityFragment implements
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_go_to_start_directory:
-                setCrumb(new BreadCrumbLayout.Crumb(
-                        tryGetCanonicalFile(PreferenceUtil.getInstance(requireContext()).getStartDirectory())), true);
+                setCrumb(tryGetCanonicalFile(PreferenceUtil.getInstance(requireContext()).getStartDirectory()));
                 return true;
             case R.id.action_scan:
-                BreadCrumbLayout.Crumb crumb = getActiveCrumb();
-                if (crumb != null) {
+
+              /*  if (crumb != null) {
                     //noinspection Convert2MethodRef
                     new ListPathsAsyncTask(getActivity(), paths -> scanPaths(paths))
                             .execute(new ListPathsAsyncTask.LoadingInfo(crumb.getFile(),
                                     AUDIO_FILE_FILTER));
-                }
+                }*/
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onQueueChanged() {
-        super.onQueueChanged();
-        checkForPadding();
-    }
-
-    @Override
-    public void onServiceConnected() {
-        super.onServiceConnected();
-        checkForPadding();
     }
 
     @NonNull
@@ -384,12 +338,6 @@ public class FoldersFragment extends AbsMainActivityFragment implements
         return cab;
     }
 
-    private void checkForPadding() {
-        final int count = adapter.getItemCount();
-        final MarginLayoutParams params = (MarginLayoutParams) coordinatorLayout.getLayoutParams();
-        params.bottomMargin = count > 0 && !MusicPlayerRemote.getPlayingQueue().isEmpty() ? DensityUtil
-                .dip2px(requireContext(), 104f) : DensityUtil.dip2px(requireContext(), 54f);
-    }
 
     private void checkIsEmpty() {
         emojiText.setText(getEmojiByUnicode(0x1F631));
@@ -398,11 +346,6 @@ public class FoldersFragment extends AbsMainActivityFragment implements
         }
     }
 
-    @Nullable
-    private BreadCrumbLayout.Crumb getActiveCrumb() {
-        return breadCrumbs != null && breadCrumbs.size() > 0 ? breadCrumbs
-                .getCrumb(breadCrumbs.getActiveIndex()) : null;
-    }
 
     private String getEmojiByUnicode(int unicode) {
         return new String(Character.toChars(unicode));
@@ -415,18 +358,11 @@ public class FoldersFragment extends AbsMainActivityFragment implements
     private void initViews(View view) {
         coordinatorLayout = view.findViewById(R.id.coordinatorLayout);
         recyclerView = view.findViewById(R.id.recyclerView);
-        breadCrumbs = view.findViewById(R.id.breadCrumbs);
+
         empty = view.findViewById(android.R.id.empty);
         emojiText = view.findViewById(R.id.emptyEmoji);
     }
 
-    private void saveScrollPosition() {
-        BreadCrumbLayout.Crumb crumb = getActiveCrumb();
-        if (crumb != null) {
-            crumb.setScrollPosition(
-                    ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
-        }
-    }
 
     private void scanPaths(@Nullable String[] toBeScanned) {
         if (getActivity() == null) {
@@ -440,15 +376,12 @@ public class FoldersFragment extends AbsMainActivityFragment implements
         }
     }
 
-    private void setCrumb(BreadCrumbLayout.Crumb crumb, boolean addToHistory) {
-        if (crumb == null) {
-            return;
-        }
-        saveScrollPosition();
-        breadCrumbs.setActiveOrAdd(crumb, false);
-        if (addToHistory) {
-            breadCrumbs.addHistory(crumb);
-        }
+    public File getFile() {
+        return file;
+    }
+
+    private void setCrumb(File file) {
+        this.file = file;
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
@@ -460,23 +393,12 @@ public class FoldersFragment extends AbsMainActivityFragment implements
             public void onChanged() {
                 super.onChanged();
                 checkIsEmpty();
-                checkForPadding();
             }
         });
         recyclerView.setAdapter(adapter);
         checkIsEmpty();
     }
 
-    private void setUpAppbarColor() {
-        breadCrumbs.setActivatedContentColor(
-                ATHUtil.INSTANCE.resolveColor(requireContext(), android.R.attr.textColorPrimary));
-        breadCrumbs.setDeactivatedContentColor(
-                ATHUtil.INSTANCE.resolveColor(requireContext(), android.R.attr.textColorSecondary));
-    }
-
-    private void setUpBreadCrumbs() {
-        breadCrumbs.setCallback(this);
-    }
 
     private void setUpRecyclerView() {
         recyclerView.setLayoutManager(new OverScrollLinearLayoutManager(getActivity()));
@@ -493,11 +415,7 @@ public class FoldersFragment extends AbsMainActivityFragment implements
 
     private void updateAdapter(@NonNull List<File> files) {
         adapter.swapDataSet(files);
-        BreadCrumbLayout.Crumb crumb = getActiveCrumb();
-        if (crumb != null && recyclerView != null) {
-            ((LinearLayoutManager) recyclerView.getLayoutManager())
-                    .scrollToPositionWithOffset(crumb.getScrollPosition(), 0);
-        }
+
     }
 
     public static class ListPathsAsyncTask extends
@@ -596,7 +514,7 @@ public class FoldersFragment extends AbsMainActivityFragment implements
         private WeakReference<FoldersFragment> fragmentWeakReference;
 
         AsyncFileLoader(FoldersFragment foldersFragment) {
-            super(Objects.requireNonNull(foldersFragment.getActivity()));
+            super(foldersFragment.requireActivity());
             fragmentWeakReference = new WeakReference<>(foldersFragment);
         }
 
@@ -605,10 +523,7 @@ public class FoldersFragment extends AbsMainActivityFragment implements
             FoldersFragment foldersFragment = fragmentWeakReference.get();
             File directory = null;
             if (foldersFragment != null) {
-                BreadCrumbLayout.Crumb crumb = foldersFragment.getActiveCrumb();
-                if (crumb != null) {
-                    directory = crumb.getFile();
-                }
+                directory = foldersFragment.getFile();
             }
             if (directory != null) {
                 List<File> files = FileUtil.listFiles(directory, AUDIO_FILE_FILTER);

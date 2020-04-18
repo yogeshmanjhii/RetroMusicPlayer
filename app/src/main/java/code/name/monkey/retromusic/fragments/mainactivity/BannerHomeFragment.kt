@@ -14,39 +14,24 @@
 
 package code.name.monkey.retromusic.fragments.mainactivity
 
-import android.app.ActivityOptions
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.MergeAdapter
 import code.name.monkey.retromusic.App
-import code.name.monkey.retromusic.Constants
-import code.name.monkey.retromusic.Constants.USER_BANNER
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.HomeAdapter
+import code.name.monkey.retromusic.adapter.SmartPlaylistAdapter
 import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.MainActivityFragmentCallbacks
-import code.name.monkey.retromusic.loaders.SongLoader
 import code.name.monkey.retromusic.model.Home
-import code.name.monkey.retromusic.model.smartplaylist.HistoryPlaylist
-import code.name.monkey.retromusic.model.smartplaylist.LastAddedPlaylist
-import code.name.monkey.retromusic.model.smartplaylist.MyTopTracksPlaylist
 import code.name.monkey.retromusic.mvp.presenter.HomePresenter
 import code.name.monkey.retromusic.mvp.presenter.HomeView
-import code.name.monkey.retromusic.util.NavigationUtil
-import code.name.monkey.retromusic.util.PreferenceUtil
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dev.olog.scrollhelper.layoutmanagers.OverScrollLinearLayoutManager
-import kotlinx.android.synthetic.main.abs_playlists.*
-import kotlinx.android.synthetic.main.fragment_banner_home.*
 import kotlinx.android.synthetic.main.home_content.*
-import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 class BannerHomeFragment : AbsMainActivityFragment(), MainActivityFragmentCallbacks, HomeView {
@@ -65,27 +50,12 @@ class BannerHomeFragment : AbsMainActivityFragment(), MainActivityFragmentCallba
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(
-            if (PreferenceUtil.getInstance(requireContext()).isHomeBanner) R.layout.fragment_banner_home else R.layout.fragment_home,
+            R.layout.fragment_home,
             viewGroup,
             false
         )
     }
 
-    private fun loadImageFromStorage() {
-        Glide.with(requireContext())
-            .load(
-                File(
-                    PreferenceUtil.getInstance(requireContext()).profileImage,
-                    Constants.USER_PROFILE
-                )
-            )
-            .asBitmap()
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .placeholder(R.drawable.ic_person_flat)
-            .error(R.drawable.ic_person_flat)
-            .into(userImage)
-    }
 
     private val displayMetrics: DisplayMetrics
         get() {
@@ -99,51 +69,13 @@ class BannerHomeFragment : AbsMainActivityFragment(), MainActivityFragmentCallba
         super.onViewCreated(view, savedInstanceState)
         setStatusBarColorAuto(view)
 
-        bannerImage?.setOnClickListener {
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                mainActivity,
-                userImage,
-                getString(R.string.transition_user_image)
-            )
-            NavigationUtil.goToUserInfo(requireActivity(), options)
-        }
-
-        lastAdded.setOnClickListener {
-            NavigationUtil.goToPlaylistNew(requireActivity(), LastAddedPlaylist(requireActivity()))
-        }
-
-        topPlayed.setOnClickListener {
-            NavigationUtil.goToPlaylistNew(
-                requireActivity(),
-                MyTopTracksPlaylist(requireActivity())
-            )
-        }
-
-        actionShuffle.setOnClickListener {
-            MusicPlayerRemote.openAndShuffleQueue(SongLoader.getAllSongs(requireActivity()), true)
-        }
-
-        history.setOnClickListener {
-            NavigationUtil.goToPlaylistNew(requireActivity(), HistoryPlaylist(requireActivity()))
-        }
-
-        userImage?.setOnClickListener {
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                mainActivity,
-                userImage,
-                getString(R.string.transition_user_image)
-            )
-            NavigationUtil.goToUserInfo(requireActivity(), options)
-        }
-        titleWelcome?.text =
-            String.format("%s", PreferenceUtil.getInstance(requireContext()).userName)
-
         App.musicComponent.inject(this)
         homeAdapter = HomeAdapter(mainActivity, displayMetrics)
+        val smartPlaylistAdapter: SmartPlaylistAdapter = SmartPlaylistAdapter()
 
         recyclerView.apply {
             layoutManager = OverScrollLinearLayoutManager(mainActivity)
-            adapter = homeAdapter
+            adapter = MergeAdapter(smartPlaylistAdapter, homeAdapter)
         }
         homePresenter.attachView(this)
         homePresenter.loadSections()
@@ -153,11 +85,6 @@ class BannerHomeFragment : AbsMainActivityFragment(), MainActivityFragmentCallba
         return false
     }
 
-    override fun onResume() {
-        super.onResume()
-        getTimeOfTheDay()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         homePresenter.detachView()
@@ -165,49 +92,6 @@ class BannerHomeFragment : AbsMainActivityFragment(), MainActivityFragmentCallba
 
     override fun showEmptyView() {
         emptyContainer.show()
-    }
-
-    private fun getTimeOfTheDay() {
-        val c = Calendar.getInstance()
-        val timeOfDay = c.get(Calendar.HOUR_OF_DAY)
-        var images = arrayOf<String>()
-        when (timeOfDay) {
-            in 0..5 -> images = resources.getStringArray(R.array.night)
-            in 6..11 -> images = resources.getStringArray(R.array.morning)
-            in 12..15 -> images = resources.getStringArray(R.array.after_noon)
-            in 16..19 -> images = resources.getStringArray(R.array.evening)
-            in 20..23 -> images = resources.getStringArray(R.array.night)
-        }
-        val day = images[Random().nextInt(images.size)]
-        loadTimeImage(day)
-    }
-
-    private fun loadTimeImage(day: String) {
-        bannerImage?.let {
-            val request = Glide.with(requireContext())
-            if (PreferenceUtil.getInstance(requireContext()).bannerImage.isEmpty()) {
-                request.load(day)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .placeholder(R.drawable.material_design_default)
-                    .error(R.drawable.material_design_default)
-                    .into(it)
-            } else {
-                request.load(
-                    File(
-                        PreferenceUtil.getInstance(requireContext()).bannerImage,
-                        USER_BANNER
-                    )
-                )
-                    .asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .placeholder(R.drawable.material_design_default)
-                    .error(R.drawable.material_design_default)
-                    .into(it)
-            }
-        }
-        loadImageFromStorage()
     }
 
     companion object {
