@@ -40,6 +40,7 @@ class SongsFragment :
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     override fun createLayoutManager(): GridLayoutManager {
         return GridLayoutManager(requireActivity(), getGridSize()).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -52,6 +53,10 @@ class SongsFragment :
                 }
             }
         }
+=======
+    override fun createLayoutManager(): LinearLayoutManager {
+        return LinearLayoutManager(requireActivity())
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
 =======
     override fun createLayoutManager(): LinearLayoutManager {
         return LinearLayoutManager(requireActivity())

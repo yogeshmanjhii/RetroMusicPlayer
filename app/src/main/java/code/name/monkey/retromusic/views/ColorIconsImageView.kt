@@ -47,7 +47,11 @@ class ColorIconsImageView @JvmOverloads constructor(
     fun setIconBackgroundColor(color: Int) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         background = ContextCompat.getDrawable(context, R.drawable.color_circle_gradient)
+=======
+        setBackgroundResource(R.drawable.color_circle_gradient)
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
 =======
         setBackgroundResource(R.drawable.color_circle_gradient)
 >>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
