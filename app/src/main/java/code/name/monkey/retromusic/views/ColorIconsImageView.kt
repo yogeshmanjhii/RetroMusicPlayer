@@ -46,7 +46,9 @@ class ColorIconsImageView @JvmOverloads constructor(
 
     fun setIconBackgroundColor(color: Int) {
         background = ContextCompat.getDrawable(context, R.drawable.color_circle_gradient)
-        if (ATHUtil.isWindowBackgroundDark(context) && PreferenceUtil.getInstance(context).desaturatedColor()) {
+        if (ATHUtil.isWindowBackgroundDark(context) && PreferenceUtil.getInstance(context)
+                .desaturatedColor()
+        ) {
             val desaturatedColor = RetroColorUtil.desaturateColor(color, 0.4f)
             backgroundTintList = ColorStateList.valueOf(desaturatedColor)
             imageTintList =
