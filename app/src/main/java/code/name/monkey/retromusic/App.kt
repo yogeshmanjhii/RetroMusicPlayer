@@ -22,7 +22,6 @@ import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
 import code.name.monkey.retromusic.dagger.DaggerMusicComponent
 import code.name.monkey.retromusic.dagger.MusicComponent
 import code.name.monkey.retromusic.dagger.module.AppModule
-import code.name.monkey.retromusic.equalizer.AudioEffects
 import com.anjlab.android.iab.v3.BillingProcessor
 import com.anjlab.android.iab.v3.TransactionDetails
 
@@ -65,7 +64,6 @@ class App : MultiDexApplication() {
                 override fun onBillingInitialized() {}
             })
 
-        AudioEffects.init(this)
     }
 
     private fun initDagger(app: App): MusicComponent =

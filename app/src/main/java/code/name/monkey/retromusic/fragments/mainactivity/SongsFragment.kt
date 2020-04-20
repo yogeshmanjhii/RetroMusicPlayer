@@ -3,6 +3,7 @@ package code.name.monkey.retromusic.fragments.mainactivity
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.R
@@ -38,9 +39,6 @@ class SongsFragment :
         songPresenter.attachView(this)
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     override fun createLayoutManager(): GridLayoutManager {
         return GridLayoutManager(requireActivity(), getGridSize()).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -53,18 +51,6 @@ class SongsFragment :
                 }
             }
         }
-=======
-    override fun createLayoutManager(): LinearLayoutManager {
-        return LinearLayoutManager(requireActivity())
->>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
-=======
-    override fun createLayoutManager(): LinearLayoutManager {
-        return LinearLayoutManager(requireActivity())
->>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
-=======
-    override fun createLayoutManager(): LinearLayoutManager {
-        return LinearLayoutManager(requireActivity())
->>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
     }
 
     override fun createAdapter(): SongAdapter {
