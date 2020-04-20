@@ -57,6 +57,7 @@ import code.name.monkey.retromusic.transform.HorizontalFlipTransformation;
 import code.name.monkey.retromusic.transform.NormalPageTransformer;
 import code.name.monkey.retromusic.transform.VerticalFlipTransformation;
 import code.name.monkey.retromusic.transform.VerticalStackTransformer;
+import code.name.monkey.retromusic.util.theme.ThemeMode;
 
 public final class PreferenceUtil {
 
@@ -396,9 +397,11 @@ public final class PreferenceUtil {
                 .getInt(ALBUM_GRID_SIZE_LAND, context.getResources().getInteger(R.integer.default_grid_columns_land));
     }
 
-
     @LayoutRes
     public int getAlbumGridStyle() {
+        if (mPreferences.contains(ALBUM_GRID_STYLE)) {
+            Log.i(TAG, "getAlbumGridStyle: " + mPreferences.getInt(ALBUM_GRID_STYLE, -10));
+        }
         return mPreferences.getInt(ALBUM_GRID_STYLE, R.layout.item_grid);
     }
 
@@ -527,11 +530,20 @@ public final class PreferenceUtil {
     }
 
     @NonNull
-    public String getGeneralThemeValue() {
+    public ThemeMode getGeneralThemeValue() {
         if (isBlackMode()) {
-            return "black";
+            return ThemeMode.BLACK;
         } else {
-            return mPreferences.getString(GENERAL_THEME, "dark");
+            String themeMode = mPreferences.getString(GENERAL_THEME, "dark");
+            switch (themeMode) {
+                case "light":
+                    return ThemeMode.LIGHT;
+                case "dark":
+                    return ThemeMode.DARK;
+                case "auto":
+                default:
+                    return ThemeMode.AUTO;
+            }
         }
     }
 

@@ -3,7 +3,7 @@ package code.name.monkey.retromusic.fragments.mainactivity
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.song.ShuffleButtonSongAdapter
@@ -18,7 +18,7 @@ import java.util.*
 import javax.inject.Inject
 
 class SongsFragment :
-    AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdapter, GridLayoutManager>(),
+    AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdapter, LinearLayoutManager>(),
     SongView, MainActivityFragmentCallbacks {
 
     @Inject
@@ -38,6 +38,9 @@ class SongsFragment :
         songPresenter.attachView(this)
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
     override fun createLayoutManager(): GridLayoutManager {
         return GridLayoutManager(requireActivity(), getGridSize()).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -50,6 +53,18 @@ class SongsFragment :
                 }
             }
         }
+=======
+    override fun createLayoutManager(): LinearLayoutManager {
+        return LinearLayoutManager(requireActivity())
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
+=======
+    override fun createLayoutManager(): LinearLayoutManager {
+        return LinearLayoutManager(requireActivity())
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
+=======
+    override fun createLayoutManager(): LinearLayoutManager {
+        return LinearLayoutManager(requireActivity())
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
     }
 
     override fun createAdapter(): SongAdapter {
@@ -57,7 +72,7 @@ class SongsFragment :
         return ShuffleButtonSongAdapter(
             mainActivity,
             dataSet,
-            itemLayoutRes(),
+            R.layout.item_list,
             mainActivity
         )
     }
@@ -71,7 +86,7 @@ class SongsFragment :
     }
 
     override fun loadGridSize(): Int {
-        return PreferenceUtil.getInstance(requireContext()).getSongGridSize(requireContext())
+        return PreferenceUtil.getInstance(requireContext()).getSongGridSize(requireActivity())
     }
 
     override fun saveGridSize(gridColumns: Int) {
@@ -79,7 +94,7 @@ class SongsFragment :
     }
 
     override fun loadGridSizeLand(): Int {
-        return PreferenceUtil.getInstance(requireContext()).getSongGridSizeLand(requireContext())
+        return PreferenceUtil.getInstance(requireContext()).getSongGridSizeLand(requireActivity())
     }
 
     override fun saveGridSizeLand(gridColumns: Int) {
@@ -136,11 +151,10 @@ class SongsFragment :
 
     @LayoutRes
     override fun loadLayoutRes(): Int {
-        return PreferenceUtil.getInstance(requireContext()).songGridStyle
+        return R.layout.item_list
     }
 
     override fun saveLayoutRes(@LayoutRes layoutRes: Int) {
-        PreferenceUtil.getInstance(requireContext()).songGridStyle = layoutRes
     }
 
     override fun handleBackPress(): Boolean {

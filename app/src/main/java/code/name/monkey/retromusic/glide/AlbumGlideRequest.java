@@ -111,8 +111,7 @@ public class AlbumGlideRequest {
     }
 
     public static class PaletteBuilder {
-        private static final String TAG = "PaletteBuilder";
-        final Context context;
+        private  final Context context;
         private final Builder builder;
 
         PaletteBuilder(Builder builder, Context context) {

@@ -153,7 +153,6 @@ public class ArtistGlideRequest {
                     .transcode(new BitmapPaletteTranscoder(context), BitmapPaletteWrapper.class)
                     .diskCacheStrategy(DEFAULT_DISK_CACHE_STRATEGY)
                     .placeholder(DEFAULT_ERROR_IMAGE)
-                    .error(DEFAULT_ERROR_IMAGE)
                     .animate(DEFAULT_ANIMATION)
                     .priority(Priority.LOW)
                     .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
