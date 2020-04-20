@@ -45,7 +45,11 @@ class ColorIconsImageView @JvmOverloads constructor(
     }
 
     fun setIconBackgroundColor(color: Int) {
+<<<<<<< HEAD
         background = ContextCompat.getDrawable(context, R.drawable.color_circle_gradient)
+=======
+        setBackgroundResource(R.drawable.color_circle_gradient)
+>>>>>>> parent of c6fc672c... Added adapitve icon and grid size change forsong
         if (ATHUtil.isWindowBackgroundDark(context) && PreferenceUtil.getInstance(context).desaturatedColor()) {
             val desaturatedColor = RetroColorUtil.desaturateColor(color, 0.4f)
             backgroundTintList = ColorStateList.valueOf(desaturatedColor)
