@@ -61,6 +61,7 @@ import code.name.monkey.retromusic.util.theme.ThemeMode;
 
 public final class PreferenceUtil {
 
+    public static final String LANGUAGE_NAME = "language_name";
     public static final String LIBRARY_CATEGORIES = "library_categories";
 
     public static final String EXTRA_SONG_INFO = "extra_song_info";
@@ -986,5 +987,9 @@ public final class PreferenceUtil {
 
     public boolean isExpandPanel() {
         return mPreferences.getBoolean(EXPAND_NOW_PLAYING_PANEL, false);
+    }
+
+    public String getLanguageCode() {
+        return mPreferences.getString(LANGUAGE_NAME, "en");
     }
 }

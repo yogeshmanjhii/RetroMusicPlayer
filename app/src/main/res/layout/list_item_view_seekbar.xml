@@ -36,7 +36,9 @@
         app:tint="?attr/colorControlNormal"
         tools:srcCompat="@drawable/ic_telegram_white" />
 
-    <com.google.android.material.textview.MaterialTextView
+
+    <code.name.monkey.retromusic.views.BaselineGridTextView
+        app:lineHeightHint="24sp"
         android:id="@android:id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

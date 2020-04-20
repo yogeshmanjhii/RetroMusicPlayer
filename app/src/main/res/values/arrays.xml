@@ -178,6 +178,72 @@
     <array name="pref_album_details_style_layout">
         <item>@layout/activity_album</item>
     </array>
-
-    <string name="tiny_card_style">Tiny card</string>
+    <string-array name="pref_language_names">
+        <item>Auto</item>
+        <item>Arabic</item>
+        <item>Bulgarian</item>
+        <item>China(CN)</item>
+        <item>Hong Kong SAR China(HK)</item>
+        <item>Taiwan(TW)</item>
+        <item>Croatian</item>
+        <item>Czech</item>
+        <item>Dutch</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Germany</item>
+        <item>Greek</item>
+        <item>Hindi</item>
+        <item>Hungarian</item>
+        <item>Indonesian</item>
+        <item>Indonesian(IN)</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Malay</item>
+        <item>Polish</item>
+        <item>Brazil</item>
+        <item>Romanian</item>
+        <item>Russian</item>
+        <item>Serbian</item>
+        <item>Spanish</item>
+        <item>Spain(eu-rES)</item>
+        <item>Spanish(es-rES)</item>
+        <item>Spanish(es-rUS)</item>
+        <item>Turkish</item>
+        <item>Vietnamese</item>
+    </string-array>
+    <string-array name="pref_language_codes">
+        <item>auto</item>
+        <item>ar</item>
+        <item>bg</item>
+        <item>zh-cn</item>
+        <item>zh-hk</item>
+        <item>zh-tw</item>
+        <item>hr</item>
+        <item>cs</item>
+        <item>nl</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>de-in</item>
+        <item>el</item>
+        <item>hi-in</item>
+        <item>hu</item>
+        <item>id</item>
+        <item>in</item>
+        <item>it</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>ms</item>
+        <item>pl</item>
+        <item>pt-rBR</item>
+        <item>ro</item>
+        <item>ru</item>
+        <item>sr</item>
+        <item>es</item>
+        <item>eu-rES</item>
+        <item>es-rES</item>
+        <item>es-rUS</item>
+        <item>tr</item>
+        <item>vi</item>
+    </string-array>
 </resources>

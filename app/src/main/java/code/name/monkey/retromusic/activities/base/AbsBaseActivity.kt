@@ -1,6 +1,7 @@
 package code.name.monkey.retromusic.activities.base
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
@@ -12,8 +13,11 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.core.app.ActivityCompat
 import code.name.monkey.appthemehelper.ThemeStore
+import code.name.monkey.retromusic.LanguageContextWrapper
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.util.PreferenceUtil
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
 
 abstract class AbsBaseActivity : AbsThemeActivity() {
     private var hadPermissions: Boolean = false
@@ -138,6 +142,17 @@ abstract class AbsBaseActivity : AbsThemeActivity() {
             hadPermissions = true
             onHasPermissionsChanged(true)
         }
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        if (PreferenceUtil.getInstance(newBase).languageCode != "auto") {
+            val context: Context = LanguageContextWrapper.wrap(
+                newBase,
+                Locale(PreferenceUtil.getInstance(newBase).languageCode)
+            )
+            super.attachBaseContext(context)
+        } else
+            super.attachBaseContext(newBase)
     }
 
     companion object {

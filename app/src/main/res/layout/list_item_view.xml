@@ -36,7 +36,7 @@
         app:tint="?attr/colorControlNormal"
         tools:srcCompat="@drawable/ic_telegram_white" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <code.name.monkey.retromusic.views.BaselineGridTextView
         android:id="@android:id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -45,7 +45,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline_front_margin"
         app:layout_constraintTop_toTopOf="parent"
-        tools:maxLines="@string/grid_size_1"
+        app:lineHeightHint="24sp"
+        tools:maxLines="2"
         tools:text="@tools:sample/lorem/random" />
 
     <code.name.monkey.retromusic.views.BaselineGridTextView
@@ -58,7 +59,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline_front_margin"
         app:layout_constraintTop_toBottomOf="@android:id/title"
-        app:lineHeightHint="20sp"
+        app:lineHeightHint="24sp"
         tools:maxLines="2"
         tools:text="@tools:sample/lorem/random" />
 
